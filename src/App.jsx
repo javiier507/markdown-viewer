@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { marked } from 'marked'
 import { markedHighlight } from 'marked-highlight'
 import hljs from 'highlight.js'
@@ -22,7 +22,12 @@ function App() {
   const [files, setFiles] = useState([])
   const [activeId, setActiveId] = useState(null)
   const fileInputRef = useRef(null)
+  const activeItemRef = useRef(null)
   const nextIdRef = useRef(1)
+
+  useEffect(() => {
+    activeItemRef.current?.scrollIntoView({ block: 'nearest' })
+  }, [activeId])
 
   const activeFile = useMemo(
     () => files.find((f) => f.id === activeId) ?? null,
@@ -41,9 +46,10 @@ function App() {
 
   const handleFilesSelected = async (event) => {
     const picked = Array.from(event.target.files ?? [])
+    event.target.value = ''
     if (picked.length === 0) return
 
-    const loaded = await Promise.all(
+    const results = await Promise.allSettled(
       picked.map(async (file) => ({
         id: nextIdRef.current++,
         name: file.name,
@@ -51,9 +57,19 @@ function App() {
       })),
     )
 
+    const loaded = results
+      .filter((r) => r.status === 'fulfilled')
+      .map((r) => r.value)
+
+    if (loaded.length === 0) return
+
     setFiles((prev) => [...prev, ...loaded])
-    setActiveId((prev) => prev ?? loaded[0].id)
-    event.target.value = ''
+    setActiveId(loaded[0].id)
+  }
+
+  const removeFile = (id) => {
+    setFiles((prev) => prev.filter((f) => f.id !== id))
+    setActiveId((prev) => (prev === id ? null : prev))
   }
 
   const hasFiles = files.length > 0
@@ -90,6 +106,7 @@ function App() {
               return (
                 <li
                   key={file.id}
+                  ref={isActive ? activeItemRef : null}
                   className={`file-item ${isActive ? 'file-item--active' : ''}`}
                 >
                   <button
@@ -104,6 +121,7 @@ function App() {
                   <button
                     type="button"
                     className="file-item__remove"
+                    onClick={() => removeFile(file.id)}
                     aria-label={`Remove ${file.name}`}
                     title="Remove file"
                   >
