@@ -2,7 +2,7 @@
 
 - [ ] Add files
 - [ ] Remove files from sidebar
-- [ ] Add syntax highlighting for markdown
+- [x] Add syntax highlighting for markdown
 - [ ] Create a skill as system design
 - [ ] Add OpenSpec
 - [ ] Add tauri
