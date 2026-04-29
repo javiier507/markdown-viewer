@@ -1,18 +1,47 @@
-# React + Vite
+# Markdown Viewer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A clean markdown viewer built with React + Vite, with optional desktop packaging via Tauri 2. Open one or many `.md` files, switch between them in a left sidebar, read them rendered with syntax highlighting, light/dark theme.
 
-Currently, two official plugins are available:
+## Requirements
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Node** 18+ and **pnpm** — required for both web and desktop workflows.
+- **Rust toolchain** (stable, via `rustup`) — required only for Tauri commands.
+- **Platform-specific system dependencies** for Tauri (MSVC Build Tools on Windows, WebKitGTK + build-essential on Linux, Xcode CLT on macOS).
 
-## React Compiler
+See the official Tauri prerequisites guide for the exact install steps per OS: <https://v2.tauri.app/start/prerequisites/>
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+## Install
 
-Note: This will impact Vite dev & build performances.
+```sh
+pnpm install
+```
 
-## Expanding the ESLint configuration
+## Web (Vite only)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```sh
+pnpm dev          # start dev server at http://localhost:5173
+pnpm build        # production build into dist/
+pnpm preview      # serve the production build locally
+pnpm lint         # run ESLint
+```
+
+## Desktop (Tauri)
+
+```sh
+pnpm tauri:dev    # launches Vite + compiles Rust + opens the desktop window
+pnpm tauri:build  # produces the platform installer (.msi/.exe/.dmg/.AppImage)
+pnpm tauri        # raw Tauri CLI passthrough (e.g. pnpm tauri info)
+```
+
+`tauri:dev` runs `pnpm dev` automatically via `beforeDevCommand`, so a single command brings up everything. The first run compiles ~400 Rust crates and can take 5–15 minutes; subsequent runs are fast.
+
+Build artifacts land in `src-tauri/target/release/bundle/`.
+
+## Project layout
+
+```
+src/                 React app (App.jsx, App.css, syntax.css, index.css)
+src-tauri/           Tauri (Rust) backend + tauri.conf.json
+public/              static assets served by Vite
+dist/                Vite production output (consumed by Tauri's frontendDist)
+```
