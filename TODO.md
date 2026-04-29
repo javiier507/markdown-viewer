@@ -6,5 +6,9 @@
 - [x] Create a skill as system design
 - [ ] Add OpenSpec
 - [x] Add tauri
+- [ ] Add semantic commits with linter
 - [ ] Add Release Please
 - [ ] Move this TODO file to Notion and connect it with MCP
+- [ ] Add testing. Playwright or Testing Library
+- [ ] Fix: duplicated files in sidebar when a file in opened again
+- [ ] Add hamburguer button with option to remove file from sidebar.
