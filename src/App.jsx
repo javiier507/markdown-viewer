@@ -53,6 +53,7 @@ function App() {
       picked.map(async (file) => ({
         id: nextIdRef.current++,
         name: file.name,
+        key: `${file.name}::${file.size}::${file.lastModified}`,
         content: await file.text(),
       })),
     )
@@ -63,8 +64,23 @@ function App() {
 
     if (loaded.length === 0) return
 
-    setFiles((prev) => [...prev, ...loaded])
-    setActiveId(loaded[0].id)
+    setFiles((prev) => {
+      const existingKeys = new Map(prev.map((f) => [f.key, f.id]))
+      const additions = []
+      let firstId = null
+      for (const file of loaded) {
+        const existingId = existingKeys.get(file.key)
+        if (existingId != null) {
+          if (firstId == null) firstId = existingId
+        } else {
+          additions.push(file)
+          existingKeys.set(file.key, file.id)
+          if (firstId == null) firstId = file.id
+        }
+      }
+      if (firstId != null) setActiveId(firstId)
+      return additions.length > 0 ? [...prev, ...additions] : prev
+    })
   }
 
   const removeFile = (id) => {
