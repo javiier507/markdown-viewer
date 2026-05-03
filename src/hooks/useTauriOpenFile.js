@@ -21,7 +21,10 @@ export function useTauriOpenFile(onOpenFile) {
         import('@tauri-apps/api/core'),
       ])
 
-      const pending = await invoke('take_pending_file').catch(() => null)
+      const pending = await invoke('take_pending_file').catch((err) => {
+        console.warn('take_pending_file failed:', err)
+        return null
+      })
       if (!cancelled && pending) handlerRef.current(pending)
 
       const off = await listen('open-file', (e) =>
