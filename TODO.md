@@ -11,7 +11,7 @@
 - [ ] Move this TODO file to Notion and connect it with MCP
 - [ ] Add testing. Playwright or Testing Library
 - [x] Fix: duplicated files in sidebar when a file in opened again
-- [ ] Add hamburguer button with option to remove file from sidebar.
+- [x] Add three-dot button with an option to remove file from sidebar.
 - [x] Associate the Markdown file extension so that it can be opened directly from Windows File Explorer.
 - [x] Refactor: split in several component. Modular and isolated component.
 - [ ] Add support for anchor link
