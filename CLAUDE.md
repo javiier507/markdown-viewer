@@ -5,14 +5,10 @@ A web-based markdown viewer built with React + Vite. Users open local `.md` file
 ## Features
 
 - **Empty state** — centered "Open File" button when no files are loaded.
-- **Multi-file sidebar** — left rail (264px) lists every opened file; click to switch the active one. The `+` button at the top opens the file picker to add more.
+- **Multi-file sidebar** — left rail (264px) lists every opened file; click to switch the active one. The `+` button at the top opens the file picker to add more, and a per-file `×` button (visible on hover/active) removes that file.
 - **Syntax highlighting** — fenced code blocks are highlighted via `highlight.js`; falls back to plaintext for unknown languages.
 - **Light/dark theme** — follows `prefers-color-scheme` (UI + syntax tokens).
 - **Safe rendering** — markdown is parsed by `marked` and sanitized by `DOMPurify` before injection.
-
-## Design-only (not yet wired)
-
-- Per-file `×` remove button in the sidebar — appears on hover/active but has no `onClick` handler.
 
 ## Stack
 
