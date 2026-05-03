@@ -42,6 +42,45 @@
   font-size: 15px;
 }
 
+.empty-state__taglines {
+  margin-top: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.empty-state__tagline {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 13px;
+  letter-spacing: 0.2px;
+}
+
+.empty-state__repo {
+  margin-top: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 13px;
+  text-decoration: none;
+  transition:
+    color 0.12s ease,
+    background-color 0.12s ease;
+}
+
+.empty-state__repo:hover {
+  color: var(--text-h);
+  background: var(--bg-hover);
+}
+
+.empty-state__repo:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 /* ---------- Buttons ---------- */
 
 .btn {

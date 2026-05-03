@@ -14,3 +14,5 @@
 - [ ] Add hamburguer button with option to remove file from sidebar.
 - [x] Associate the Markdown file extension so that it can be opened directly from Windows File Explorer.
 - [x] Refactor: split in several component. Modular and isolated component.
+- [ ] Add support for anchor link
+- [ ] Collapse sidebar
