@@ -72,10 +72,6 @@ body,
   margin: 0;
 }
 
-body {
-  background: var(--bg);
-}
-
 button {
   font-family: inherit;
   cursor: pointer;

@@ -4,12 +4,9 @@
    --code-bg shows through and stays consistent with the rest of the UI. */
 
 .prose__body pre code.hljs {
-  display: block;
+  display: block; /* hljs resets this; ensure block layout */
   background: transparent;
   padding: 0;
-  color: var(--text-h);
-  font-size: 13.5px;
-  line-height: 1.55;
 }
 
 /* Light theme tokens */

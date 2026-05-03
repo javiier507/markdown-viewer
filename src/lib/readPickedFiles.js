@@ -1,3 +1,5 @@
+import { makeFileKey } from './fileKey.js'
+
 export async function readPickedFiles(fileList, allocateId) {
   const picked = Array.from(fileList ?? [])
   if (picked.length === 0) return []
@@ -6,7 +8,7 @@ export async function readPickedFiles(fileList, allocateId) {
     picked.map(async (file) => ({
       id: allocateId(),
       name: file.name,
-      key: `${file.name}::${file.size}::${file.lastModified}`,
+      key: makeFileKey(file),
       content: await file.text(),
     })),
   )

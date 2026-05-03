@@ -28,7 +28,7 @@ function App() {
   const hasFiles = files.length > 0
 
   return (
-    <div className={`app ${hasFiles ? 'app--with-sidebar' : 'app--empty'}`}>
+    <div className={`app ${hasFiles ? '' : 'app--empty'}`}>
       <HiddenFileInput ref={fileInputRef} onFilesSelected={addFiles} />
 
       {hasFiles && (
