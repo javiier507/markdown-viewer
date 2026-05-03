@@ -3,16 +3,26 @@ import './App.css'
 import './syntax.css'
 import { useOpenFiles } from './hooks/useOpenFiles.js'
 import { useScrollActiveIntoView } from './hooks/useScrollActiveIntoView.js'
+import { useTauriOpenFile } from './hooks/useTauriOpenFile.js'
 import HiddenFileInput from './components/HiddenFileInput.jsx'
 import Sidebar from './components/Sidebar.jsx'
 import MarkdownView from './components/MarkdownView.jsx'
 import EmptyState from './components/EmptyState.jsx'
 
 function App() {
-  const { files, activeId, activeFile, addFiles, removeFile, selectFile } =
-    useOpenFiles()
+  const {
+    files,
+    activeId,
+    activeFile,
+    addFiles,
+    addFileFromPath,
+    removeFile,
+    selectFile,
+  } = useOpenFiles()
   const activeItemRef = useScrollActiveIntoView(activeId)
   const fileInputRef = useRef(null)
+
+  useTauriOpenFile(addFileFromPath)
 
   const openFilePicker = () => fileInputRef.current?.click()
   const hasFiles = files.length > 0

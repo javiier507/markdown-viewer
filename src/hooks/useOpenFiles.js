@@ -33,6 +33,18 @@ export function useOpenFiles() {
     if (additions.length > 0) setFiles((prev) => [...prev, ...additions])
   }
 
+  const addFileFromPath = ({ path, name, content }) => {
+    const key = `path::${path}`
+    const existing = files.find((f) => f.key === key)
+    if (existing) {
+      setActiveId(existing.id)
+      return
+    }
+    const id = nextIdRef.current++
+    setActiveId(id)
+    setFiles((prev) => [...prev, { id, name, key, content }])
+  }
+
   const removeFile = (id) => {
     setFiles((prev) => prev.filter((f) => f.id !== id))
     setActiveId((prev) => (prev === id ? null : prev))
@@ -40,5 +52,13 @@ export function useOpenFiles() {
 
   const selectFile = (id) => setActiveId(id)
 
-  return { files, activeId, activeFile, addFiles, removeFile, selectFile }
+  return {
+    files,
+    activeId,
+    activeFile,
+    addFiles,
+    addFileFromPath,
+    removeFile,
+    selectFile,
+  }
 }
