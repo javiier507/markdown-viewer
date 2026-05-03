@@ -12,3 +12,4 @@ A web-based markdown viewer built with React + Vite. Users open local `.md` file
 ## Rules
 
 - Interface and code must be in English.
+- All dependencies in `package.json` must use exact versions (no `^`, `~`, or other range specifiers).
