@@ -16,3 +16,7 @@
 - [x] Refactor: split in several component. Modular and isolated component.
 - [ ] Add support for anchor link
 - [ ] Collapse sidebar
+- [ ] Drag and Drop
+- [ ] Save in browser storage: local o session storage, etc
+- [ ] Render mermaid
+- [ ] Add draft: Empty markdown files
