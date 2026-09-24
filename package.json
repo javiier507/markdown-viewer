@@ -11,6 +11,7 @@
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
+    "agents:link": "mkdir -p .agents && ln -sfn ../.claude/skills .agents/skills",
     "commit": "cz",
     "prepare": "husky"
   },
