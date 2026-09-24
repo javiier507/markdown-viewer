@@ -14,10 +14,11 @@
 - [x] Associate the Markdown file extension so that it can be opened directly from Windows File Explorer.
 - [x] Refactor: split in several component. Modular and isolated component.
 - [ ] Add support for anchor link
-- [ ] Collapse sidebar
+- [x] Collapse sidebar
 - [ ] Drag and Drop
 - [ ] Save in browser storage: local o session storage, etc
 - [ ] Render mermaid
 - [ ] Add draft: Empty markdown files
 - [ ] Open folder and diplay it in sidbear.
 - [ ] show 3 categories in sidebar: files, folders, draft files.
+- [ ] Add new skill for developing new features: how to fit new features (quality code), TDD, etc
