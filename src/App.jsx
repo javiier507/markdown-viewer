@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import './App.css'
 import './syntax.css'
 import { useOpenFiles } from './hooks/useOpenFiles.js'
@@ -21,6 +21,7 @@ function App() {
   } = useOpenFiles()
   const activeItemRef = useScrollActiveIntoView(activeId)
   const fileInputRef = useRef(null)
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
 
   useTauriOpenFile(addFileFromPath)
 
@@ -36,9 +37,11 @@ function App() {
           files={files}
           activeId={activeId}
           activeItemRef={activeItemRef}
+          isCollapsed={isSidebarCollapsed}
           onAdd={openFilePicker}
           onSelect={selectFile}
           onRemove={removeFile}
+          onToggleCollapse={() => setIsSidebarCollapsed((isCollapsed) => !isCollapsed)}
         />
       )}
 

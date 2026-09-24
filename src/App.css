@@ -126,6 +126,22 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  transition: width 0.16s ease;
+}
+
+.sidebar--collapsed {
+  width: 44px;
+}
+
+.sidebar__content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.sidebar__content[hidden] {
+  display: none;
 }
 
 .sidebar__header {
@@ -170,6 +186,55 @@
 .sidebar__add:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+.sidebar__footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.sidebar--collapsed .sidebar__footer {
+  justify-content: center;
+  padding-inline: 0;
+}
+
+.sidebar__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  transition:
+    background-color 0.12s ease,
+    color 0.12s ease,
+    transform 0.05s ease;
+}
+
+.sidebar__toggle:hover {
+  background: var(--bg-hover);
+  color: var(--text-h);
+}
+
+.sidebar__toggle:active {
+  transform: translateY(1px);
+}
+
+.sidebar__toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar {
+    transition: none;
+  }
 }
 
 .file-list {
