@@ -1,15 +1,17 @@
-# Markdown Viewer
+# Agent Guide
 
-A web-based markdown viewer built with React + Vite. Users open local `.md` files and read them rendered, with a sidebar to switch between multiple open files.
+This guide directs agents to the project documentation, repository rules, and available skills.
 
-## Features
+## Project
 
-- **Open local markdown files** — supports `.md`, `.markdown`, `.mdx`, `.txt`
-- **Switch between open files** — sidebar lists all open files; click to switch
-- **Nice code blocks** — syntax highlighting with theme matching your system
-- **Dark mode support** — automatically adapts to your system preference
+Read [README.md](./README.md) for the project overview, setup, commands, and layout.
 
 ## Rules
 
 - Interface and code must be in English.
 - All dependencies in `package.json` must use exact versions (no `^`, `~`, or other range specifiers).
+
+## Skills
+
+- [Design System](./.claude/skills/design-system/SKILL.md) — required before changing JSX or CSS that affects the UI.
+- [Tauri v2](./.claude/skills/tauri-v2/SKILL.md) — use for Tauri configuration, Rust commands, IPC, capabilities, builds, and deployment.

@@ -4,7 +4,6 @@
 - [x] Remove files from sidebar
 - [x] Add syntax highlighting for markdown
 - [x] Create a skill as system design
-- [ ] Add OpenSpec
 - [x] Add tauri
 - [x] Add semantic commits with linter
 - [ ] Add Release Please
@@ -20,3 +19,5 @@
 - [ ] Save in browser storage: local o session storage, etc
 - [ ] Render mermaid
 - [ ] Add draft: Empty markdown files
+- [ ] Open folder and diplay it in sidbear.
+- [ ] show 3 categories in sidebar: files, folders, draft files.

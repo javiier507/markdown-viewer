@@ -1,13 +1,6 @@
 # Markdown Viewer
 
-A clean markdown viewer built with React + Vite, with optional desktop packaging via Tauri 2. Open one or many `.md` files, switch between them in a left sidebar, read them rendered with syntax highlighting, light/dark theme.
-
-## Stack
-
-- **UI**: React 19, Vite 8
-- **Markdown**: `marked` + `DOMPurify`
-- **Highlighting**: `highlight.js` + `marked-highlight` (GitHub-inspired token theme in `src/syntax.css`)
-- **Desktop**: Tauri 2 (`src-tauri/`); `vite.config.js` is Tauri-aware (strict port, `TAURI_ENV_*` envPrefix, platform-specific build target, ignores `src-tauri/**` in watch).
+A focused reader for local Markdown files. Open multiple documents, move between them from the sidebar, and read rendered content with syntax highlighting and automatic light/dark theme support. Available on the web and as a desktop app.
 
 ## Requirements
 
@@ -42,16 +35,6 @@ pnpm tauri        # raw Tauri CLI passthrough (e.g. pnpm tauri info)
 
 Build artifacts land in `src-tauri/target/release/bundle/`.
 
-## Project layout
+## Development guide
 
-```
-src/                 React app (App.jsx, App.css, syntax.css, index.css)
-src-tauri/           Tauri (Rust) backend + tauri.conf.json
-public/              static assets served by Vite
-dist/                Vite production output (consumed by Tauri's frontendDist)
-```
-
-## Agent Docs
-
-- [CLAUDE.md](./CLAUDE.md) — feature overview, and development rules
-- [.claude/skills](./.claude/skills) — design system and Tauri v2 development guides
+See [CLAUDE.md](./CLAUDE.md) for repository rules and agent skills.
