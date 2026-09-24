@@ -1,10 +1,12 @@
 # Testing Plan — Markdown Viewer
 
-> **Status:** Draft · **Scope:** Frontend (React + Vite) · **Strategy:** Unit/integration testing first with Vitest + Testing Library.
+> **Status:** Draft · **Scope:** Frontend (React + Vite), implemented features only · **Strategy:** Unit/integration testing first with Vitest + Testing Library.
 
 ## 1. Goal
 
-Introduce a test suite that protects the highest-risk logic (Markdown sanitization, file state management) and supports TDD for the pending features in [TODO.md](../TODO.md), with fast feedback (< 1s) and zero flakiness.
+Introduce a test suite that protects the **currently implemented** functionality — the highest-risk logic (Markdown sanitization, file state management) and existing UI behavior — with fast feedback (< 1s) and zero flakiness.
+
+**Scope:** this plan covers only features that already exist in the codebase. Pending features listed in [TODO.md](../TODO.md) are **out of scope**; each one will define its own tests when it is developed (see [§8](#8-future-work-out-of-scope)).
 
 E2E testing (Playwright) and Rust tests (`cargo test`) are explicitly **out of scope** for this first iteration — see [§8](#8-future-work-out-of-scope).
 
@@ -15,7 +17,7 @@ E2E testing (Playwright) and Rust tests (`cargo test`) are explicitly **out of s
 Why, in short:
 
 - The codebase is already split into pure functions (`src/lib/`), hooks (`src/hooks/`), and presentational components (`src/components/`) — directly testable units.
-- Most pending TODO features are logic-heavy (anchors, Mermaid, storage, drafts, folder grouping), not pixel-heavy.
+- The behavior worth protecting today (sanitization, file dedup, floating-menu focus handling) is DOM-level logic, not pixel-level visuals — and the same layers will absorb future features as they land.
 - The highest-risk code is the `marked → highlight.js → DOMPurify` pipeline (XSS surface) — best covered by fast unit tests with malicious payloads.
 - Playwright cannot drive the Tauri desktop shell without experimental WebDriver tooling; it would only cover the secondary web target.
 
@@ -171,21 +173,7 @@ src/
 - [ ] With no files: renders `EmptyState`, no sidebar.
 - [ ] Selecting files through `HiddenFileInput` lists them and shows the active document.
 
-### Phase 4 — TDD for upcoming TODO features
-
-Write the failing test first, then implement. Suggested mapping:
-
-| TODO item | Test layer | First test to write |
-| --- | --- | --- |
-| Anchor link support | `markdown.test.js` | `[text](#section)` renders an in-page anchor; clicking scrolls without reload |
-| Render Mermaid | `markdown.test.js` | ` ```mermaid ` blocks render into a Mermaid container, not `hljs` |
-| Save in browser storage | `useOpenFiles.test.jsx` | State rehydrates from storage on mount; changes persist |
-| Add draft (empty files) | `useOpenFiles.test.jsx` | `addDraft()` creates an untitled empty entry and activates it |
-| Sidebar: 3 categories | `useOpenFiles` + `Sidebar.test.jsx` | Grouping derives files/folders/drafts correctly |
-| Drag and Drop | `App.test.jsx` | `drop` event with `dataTransfer.files` adds documents |
-| Open folder | hook/lib (new) | Folder entries appear grouped in the sidebar |
-
-### Phase 5 — Hardening
+### Phase 4 — Hardening
 
 - [ ] Add `pnpm test` to CI (and to the Release Please workflow when it lands).
 - [ ] Set a coverage floor for `src/lib/**` and `src/hooks/**` (suggested: 90% lines) — **not** for icons/presentational components.
@@ -208,11 +196,12 @@ Write the failing test first, then implement. Suggested mapping:
 | `navigator.clipboard` | Not implemented | `vi.stubGlobal('navigator', { clipboard: { writeText: vi.fn().mockResolvedValue() } })` or `Object.defineProperty` |
 | `scrollIntoView` | Not implemented (`useScrollActiveIntoView`) | Stub on `Element.prototype` in the tests that need it |
 | `getBoundingClientRect` | Returns zeros | Assert behavior, not coordinates (`useFloatingMenu`) |
-| `window.__TAURI_INTERNALS__` | Absent by default | Define per-test + `vi.mock('@tauri-apps/api/core' | '.../event')` |
+| `window.__TAURI_INTERNALS__` | Absent by default | Define per-test + `vi.mock('@tauri-apps/api/core')` and `vi.mock('@tauri-apps/api/event')` |
 | `File.text()` | Supported in jsdom 30 | Use real `File` objects; polyfill only if a failure appears |
 
 ## 8. Future work (out of scope)
 
+- **Pending TODO features:** tests for the items in [TODO.md](../TODO.md) (anchor links, Mermaid, browser storage, drafts, sidebar categories, drag & drop, open folder) are **not part of this plan** — each feature defines its own tests when it is implemented, preferably test-first.
 - **Rust:** `cargo test` for `read_file_payload` in `src-tauri/src/lib.rs` (path/name extraction, error cases).
 - **E2E smoke:** 2–3 Playwright tests against `pnpm preview` (web build) once the app stabilizes pre-release; desktop E2E only via `tauri-driver` if it ever becomes critical.
 
