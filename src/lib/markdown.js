@@ -18,5 +18,7 @@ marked.use(
 export function renderMarkdown(text) {
   if (!text) return ''
   // marked.parse() is synchronous here — no async extensions are configured
-  return DOMPurify.sanitize(marked.parse(text))
+  return DOMPurify.sanitize(marked.parse(text), {
+    FORBID_TAGS: ['form', 'input', 'button', 'textarea', 'select', 'option'],
+  })
 }

@@ -31,7 +31,7 @@ export default function MarkdownView({ content }) {
 
       btn.addEventListener('click', () => {
         const code = pre.querySelector('code')
-        const text = code ? code.innerText : pre.innerText
+        const text = code ? code.textContent : pre.textContent
         navigator.clipboard.writeText(text).then(() => {
           btn.innerHTML = CHECK_ICON
           btn.classList.add('code-copy--copied')

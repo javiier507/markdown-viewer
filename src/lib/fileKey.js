@@ -3,7 +3,7 @@
  * Uses name + size + lastModified to distinguish files without reading content.
  */
 export const makeFileKey = (file) =>
-  `${file.name}::${file.size}::${file.lastModified}`
+  `file::${file.name}::${file.size}::${file.lastModified}`
 
 /**
  * Stable identity key for a Tauri path-based file.
