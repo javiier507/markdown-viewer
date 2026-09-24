@@ -1,11 +1,23 @@
 {
   "version": 1,
   "skills": {
+    "frontend-design": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/frontend-design/SKILL.md",
+      "computedHash": "bbde8c8902d2ade04f40871ff1a7e9f4eefea0387f8c1bf6cfc1f8fe55fc9366"
+    },
     "tauri-v2": {
       "source": "nodnarbnitram/claude-code-extensions",
       "sourceType": "github",
       "skillPath": ".claude/skills/tauri-v2/SKILL.md",
       "computedHash": "7108944eec3bef17686df9ebae9c9bdbee7809744930c8734c979e3c4573eaab"
+    },
+    "web-design-guidelines": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/web-design-guidelines/SKILL.md",
+      "computedHash": "2054d70da93f39300a49de889ed3f6bdf650b4e5231c4daa3a8696cc8af70adb"
     }
   }
 }
