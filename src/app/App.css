@@ -1,7 +1,31 @@
 .app {
+  position: relative;
   display: flex;
   height: 100%;
   width: 100%;
+}
+
+.app__drop-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: var(--accent-bg);
+  border: 2px dashed var(--accent);
+  pointer-events: none;
+}
+
+.app__drop-message {
+  padding: 18px 24px;
+  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg);
+  color: var(--text-h);
+  box-shadow: var(--shadow-md);
+  font-weight: 600;
+  text-align: center;
 }
 
 .app--empty {

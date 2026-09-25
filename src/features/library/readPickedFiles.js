@@ -1,7 +1,8 @@
 import { makeFileKey } from './fileKey.js'
+import { isSupportedFile } from './supportedFiles.js'
 
 export async function readPickedFiles(fileList, allocateId) {
-  const picked = Array.from(fileList ?? [])
+  const picked = Array.from(fileList ?? []).filter((file) => isSupportedFile(file.name))
   if (picked.length === 0) return []
 
   const results = await Promise.allSettled(
