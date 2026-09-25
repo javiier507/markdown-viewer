@@ -35,10 +35,10 @@ Read that reference before performing the audit.
 Keep the audit terse and prioritize user impact:
 
 ```text
-## src/components/Example.jsx
+## src/features/example/Example.jsx
 
-src/components/Example.jsx:42 - icon-only button lacks an accessible name
-src/components/Example.jsx:58 - destructive action has no confirmation or undo
+src/features/example/Example.jsx:42 - icon-only button lacks an accessible name
+src/features/example/Example.jsx:58 - destructive action has no confirmation or undo
 ```
 
 Write `✓ pass` for a reviewed file with no findings. Do not add a preamble or

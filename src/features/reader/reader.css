@@ -1,0 +1,178 @@
+.prose {
+  max-width: 980px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 56px clamp(20px, 5%, 64px) 96px;
+}
+
+.prose__body {
+  color: var(--text);
+  font-size: 15.5px;
+  line-height: 1.7;
+}
+
+.prose__body h1,
+.prose__body h2,
+.prose__body h3,
+.prose__body h4,
+.prose__body h5,
+.prose__body h6 {
+  font-family: var(--heading);
+  color: var(--text-h);
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 1.8em 0 0.6em;
+  letter-spacing: -0.2px;
+}
+
+.prose__body h1 {
+  font-size: 30px;
+  margin-top: 0;
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid var(--border);
+}
+
+.prose__body h2 {
+  font-size: 23px;
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid var(--border);
+}
+
+.prose__body h3 {
+  font-size: 18px;
+}
+.prose__body h4 {
+  font-size: 16px;
+}
+
+.prose__body p {
+  margin: 0 0 1em;
+}
+
+.prose__body a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.prose__body a:hover {
+  text-decoration: underline;
+}
+
+.prose__body ul,
+.prose__body ol {
+  margin: 0 0 1em;
+  padding-left: 1.6em;
+}
+
+.prose__body li {
+  margin: 0.25em 0;
+}
+
+.prose__body blockquote {
+  margin: 0 0 1em;
+  padding: 0.2em 1em;
+  border-left: 3px solid var(--border-strong);
+  color: var(--text-muted);
+}
+
+.prose__body code {
+  font-family: var(--mono);
+  font-size: 0.88em;
+  background: var(--code-bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--text-h);
+}
+
+.prose__body pre {
+  position: relative;
+  background: var(--code-bg);
+  padding: 14px 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 0 0 1em;
+}
+
+.prose__body .code-copy {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--text-muted);
+  opacity: 0;
+  transition:
+    opacity 0.12s ease,
+    background-color 0.12s ease,
+    color 0.12s ease,
+    border-color 0.12s ease;
+}
+
+.prose__body pre:hover .code-copy {
+  opacity: 1;
+}
+
+.prose__body .code-copy:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-strong);
+  color: var(--text-h);
+}
+
+.prose__body .code-copy:active {
+  transform: translateY(1px);
+}
+
+.prose__body .code-copy--copied {
+  color: var(--accent);
+  border-color: var(--accent);
+  opacity: 1;
+}
+
+.prose__body .code-copy:focus-visible {
+  opacity: 1;
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.prose__body pre code {
+  background: transparent;
+  padding: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+.prose__body hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 2em 0;
+}
+
+.prose__body table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0 0 1em;
+}
+
+.prose__body th,
+.prose__body td {
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.prose__body th {
+  background: var(--bg-sidebar);
+  color: var(--text-h);
+  font-weight: 600;
+}
+
+.prose__body img {
+  max-width: 100%;
+  border-radius: 6px;
+}

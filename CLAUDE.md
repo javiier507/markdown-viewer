@@ -19,6 +19,7 @@ When asked to commit, apply the `conventional-commits` skill.
 ## Skills
 
 - [Conventional Commits](./.claude/skills/conventional-commits/SKILL.md) — required when the developer explicitly asks to create a commit.
+- [Feature Architecture](./.claude/skills/feature-architecture/SKILL.md) — use when adding features, changing shared document state, or reorganizing the React frontend.
 - [UI Guidelines](./.claude/skills/ui-guidelines/SKILL.md) — required before changing JSX or CSS for application chrome, controls, panels, dialogs, screens, themes, or interaction states.
 - [Frontend Design](./.claude/skills/frontend-design/SKILL.md) — use together with UI Guidelines for new screens, substantial redesigns, or explicit visual exploration.
 - [Markdown Viewer](./.claude/skills/markdown-viewer/SKILL.md) — use for Markdown rendering, prose and syntax styles, document links, anchors, code-copy behavior, Mermaid, or rendered-content robustness.

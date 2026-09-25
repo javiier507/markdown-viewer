@@ -1,5 +1,7 @@
 import { useMemo, useEffect, useRef } from 'react'
-import { renderMarkdown } from '../lib/markdown.js'
+import './reader.css'
+import './syntax.css'
+import { renderMarkdown } from './markdown.js'
 
 const COPY_ICON = `<svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
   <rect x="5" y="5" width="9" height="9" rx="2" stroke="currentColor" stroke-width="1.5"/>

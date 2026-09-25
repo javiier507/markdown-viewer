@@ -1,13 +1,12 @@
 import { useRef, useState } from 'react'
 import './App.css'
-import './syntax.css'
-import { useOpenFiles } from './hooks/useOpenFiles.js'
-import { useScrollActiveIntoView } from './hooks/useScrollActiveIntoView.js'
-import { useTauriOpenFile } from './hooks/useTauriOpenFile.js'
-import HiddenFileInput from './components/HiddenFileInput.jsx'
-import Sidebar from './components/Sidebar.jsx'
-import MarkdownView from './components/MarkdownView.jsx'
-import EmptyState from './components/EmptyState.jsx'
+import { useOpenFiles } from '../features/library/useOpenFiles.js'
+import { useScrollActiveIntoView } from '../features/library/useScrollActiveIntoView.js'
+import { useTauriOpenFile } from '../platform/tauri/useTauriOpenFile.js'
+import HiddenFileInput from '../features/library/HiddenFileInput.jsx'
+import Sidebar from '../features/library/Sidebar.jsx'
+import MarkdownView from '../features/reader/MarkdownView.jsx'
+import EmptyState from './EmptyState.jsx'
 
 function App() {
   const {

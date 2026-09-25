@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react'
-import { readPickedFiles } from '../lib/readPickedFiles.js'
-import { makePathKey } from '../lib/fileKey.js'
+import { readPickedFiles } from './readPickedFiles.js'
+import { makePathKey } from './fileKey.js'
 
 export function useOpenFiles() {
   const [files, setFiles] = useState([])

@@ -1,5 +1,5 @@
-import DocIcon from '../icons/DocIcon.jsx'
-import GitHubIcon from '../icons/GitHubIcon.jsx'
+import DocIcon from '../shared/ui/icons/DocIcon.jsx'
+import GitHubIcon from '../shared/ui/icons/GitHubIcon.jsx'
 
 export default function EmptyState({ onOpen }) {
   return (

@@ -10,7 +10,7 @@ web build and the Tauri desktop application.
 
 ## Boundaries
 
-- This skill owns `src/lib/markdown.js`, `MarkdownView`, `.prose*` styles,
+- This skill owns `src/features/reader/markdown.js`, `MarkdownView`, `.prose*` styles,
   `.hljs*` styles, and behavior attached to rendered document nodes.
 - Use `ui-guidelines` as well when a change introduces or alters application
   controls, shared tokens, or chrome outside the document.
