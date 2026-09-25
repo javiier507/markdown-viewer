@@ -6,9 +6,8 @@ export function useOpenFiles() {
   const [files, setFiles] = useState([])
   const [activeId, setActiveId] = useState(null)
   const nextIdRef = useRef(1)
-  // Stable ref so async callbacks always read the latest files without stale closures
+  // Keep pending updates visible to overlapping async reads before React commits.
   const filesRef = useRef(files)
-  filesRef.current = files
 
   const activeFile = useMemo(
     () => files.find((f) => f.id === activeId) ?? null,
@@ -34,7 +33,10 @@ export function useOpenFiles() {
     }
 
     if (firstId != null) setActiveId(firstId)
-    if (additions.length > 0) setFiles((prev) => [...prev, ...additions])
+    if (additions.length > 0) {
+      filesRef.current = [...filesRef.current, ...additions]
+      setFiles(filesRef.current)
+    }
   }
 
   const addFileFromPath = ({ path, name, content }) => {
@@ -46,11 +48,13 @@ export function useOpenFiles() {
     }
     const id = nextIdRef.current++
     setActiveId(id)
-    setFiles((prev) => [...prev, { id, name, key, content }])
+    filesRef.current = [...filesRef.current, { id, name, key, content }]
+    setFiles(filesRef.current)
   }
 
   const removeFile = (id) => {
-    setFiles((prev) => prev.filter((f) => f.id !== id))
+    filesRef.current = filesRef.current.filter((f) => f.id !== id)
+    setFiles(filesRef.current)
     setActiveId((prev) => (prev === id ? null : prev))
   }
 

@@ -8,7 +8,7 @@
 - [x] Add semantic commits with linter
 - [ ] Add Release Please
 - [ ] Move this TODO file to Notion and connect it with MCP
-- [ ] Add testing. Playwright or Testing Library
+- [x] Add testing with Vitest and Testing Library
 - [x] Fix: duplicated files in sidebar when a file in opened again
 - [x] Add three-dot button with an option to remove file from sidebar.
 - [x] Associate the Markdown file extension so that it can be opened directly from Windows File Explorer.

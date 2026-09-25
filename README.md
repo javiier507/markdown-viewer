@@ -4,7 +4,7 @@ A focused reader for local Markdown files. Open multiple documents, move between
 
 ## Requirements
 
-- **Node** 18+ and **pnpm**
+- **Node** 22.12+ and **pnpm** 11.24.0
 - **Rust toolchain** (stable) — only for Tauri commands; the Vite app works without it.
 - **Platform-specific dependencies** — [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/) (MSVC Build Tools on Windows, WebKitGTK on Linux, Xcode CLT on macOS).
 
@@ -21,6 +21,9 @@ pnpm dev          # start dev server at http://localhost:5173
 pnpm build        # production build into dist/
 pnpm preview      # serve the production build locally
 pnpm lint         # run ESLint
+pnpm test         # run frontend tests once
+pnpm test:watch   # rerun frontend tests while developing
+pnpm test:coverage # generate a coverage report
 ```
 
 ## Desktop (Tauri)

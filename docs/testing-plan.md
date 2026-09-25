@@ -1,10 +1,12 @@
 # Testing Plan — Markdown Viewer
 
-> **Status:** Draft · **Scope:** Frontend (React + Vite), implemented features only · **Strategy:** Unit/integration testing first with Vitest + Testing Library.
+> **Status:** Implemented 2026-09-23 · **Scope:** Frontend (React + Vite), implemented features only · **Strategy:** Unit/integration testing with Vitest + Testing Library.
+
+The implementation is on `test/frontend-suite`: 34 tests, a frontend CI workflow, and a pnpm lockfile. `jsdom@30.1.0` replaces `30.1.1` because the latter did not meet the workspace's three-day package age policy. Coverage thresholds and a pre-push hook remain deferred. Tests also exposed four fixes: separate `file::` and `path::` key namespaces, copy code via `textContent`, forbid form controls in rendered Markdown, and deduplicate overlapping file reads.
 
 ## 1. Goal
 
-Introduce a test suite that protects the **currently implemented** functionality — the highest-risk logic (Markdown sanitization, file state management) and existing UI behavior — with fast feedback (< 1s) and zero flakiness.
+Introduce a test suite that protects the **currently implemented** functionality — the highest-risk logic (Markdown sanitization, file state management) and existing UI behavior — with fast feedback (under 5s locally) and zero flakiness.
 
 **Scope:** this plan covers only features that already exist in the codebase. Pending features listed in [TODO.md](../TODO.md) are **out of scope**; each one will define its own tests when it is developed (see [§8](#8-future-work-out-of-scope)).
 
@@ -26,19 +28,19 @@ Why, in short:
 | Package | Version | Purpose |
 | --- | --- | --- |
 | `vitest` | `5.0.1` | Runner; reuses `vite.config.js` (compatible with Vite 8) |
-| `jsdom` | `30.1.1` | DOM environment |
+| `jsdom` | `30.1.0` | DOM environment |
 | `@testing-library/react` | `16.3.3` | Component + `renderHook` testing (React 19 compatible) |
 | `@testing-library/user-event` | `14.6.7` | Realistic user interactions |
 | `@testing-library/jest-dom` | `7.0.1` | DOM matchers (`toBeInTheDocument`, …) |
 | `@vitest/coverage-v8` | `5.0.1` | (Optional) coverage reports |
 
 ```sh
-pnpm add -D vitest@5.0.1 jsdom@30.1.1 @testing-library/react@16.3.3 \
+pnpm add -D -E vitest@5.0.1 jsdom@30.1.0 @testing-library/react@16.3.3 \
   @testing-library/user-event@14.6.7 @testing-library/jest-dom@7.0.1 \
   @vitest/coverage-v8@5.0.1
 ```
 
-## 4. Proposed file layout
+## 4. File layout
 
 Tests live next to the code they cover (colocated), plus one shared setup file:
 
@@ -72,11 +74,11 @@ src/
 
 ### Phase 0 — Setup
 
-- [ ] Install the dependencies listed in [§3](#3-stack-exact-versions-per-repo-rules).
-- [ ] Add a `test` block to `vite.config.js` (Vitest reads the same config; the React plugin and React Compiler preset apply to tests automatically):
+- [x] Install the dependencies listed in [§3](#3-stack-exact-versions-per-repo-rules).
+- [x] Add a `test` block to `vite.config.js` (Vitest reads the same config; the React plugin and React Compiler preset apply to tests automatically):
 
   ```js
-  /// <reference types="vitest/config" />
+  // import { defineConfig } from 'vitest/config'
   // inside defineConfig({ ... }):
   test: {
     environment: 'jsdom',
@@ -86,13 +88,16 @@ src/
   },
   ```
 
-- [ ] Create `src/test/setup.js`:
+- [x] Create `src/test/setup.js`:
 
   ```js
   import '@testing-library/jest-dom/vitest'
+  import { cleanup } from '@testing-library/react'
+  import { afterEach } from 'vitest'
+  afterEach(cleanup)
   ```
 
-- [ ] Add scripts to `package.json`:
+- [x] Add scripts to `package.json`:
 
   ```jsonc
   "test": "vitest run",
@@ -100,84 +105,86 @@ src/
   "test:coverage": "vitest run --coverage"
   ```
 
-- [ ] Smoke test: one trivial `expect(1 + 1).toBe(2)` passes with `pnpm test`.
-- [ ] Verify `pnpm lint` stays green (explicit `vitest` imports avoid new globals).
+- [x] Smoke test: the initial `lib/` suite passes with `pnpm test`.
+- [x] Verify `pnpm lint` stays green (explicit `vitest` imports avoid new globals).
 
 ### Phase 1 — `lib/` (pure functions, highest risk first)
 
 **`src/lib/markdown.test.js`** — the security-critical module:
 
-- [ ] Renders GFM: headings, tables, strikethrough, fenced code blocks.
-- [ ] Code blocks get `hljs language-*` classes; unknown languages fall back to `plaintext`.
-- [ ] **Sanitization (XSS regression suite):**
+- [x] Renders GFM: headings, tables, strikethrough, fenced code blocks.
+- [x] Code blocks get `hljs language-*` classes; unknown languages fall back to `plaintext`.
+- [x] **Sanitization (XSS regression suite):**
   - `<script>` tags are stripped.
   - Event handlers are stripped (`<img src=x onerror=...>`).
   - `javascript:` URLs in links are neutralized.
   - Injected `<iframe>` / `<form>` are removed.
-- [ ] Empty / nullish input returns `''`.
+- [x] Empty / nullish input returns `''`.
 
 **`src/lib/fileKey.test.js`:**
 
-- [ ] `makeFileKey` is stable for the same name/size/lastModified and differs when any part differs.
-- [ ] `makePathKey` is prefixed (`path::`) and cannot collide with a browser file key.
+- [x] `makeFileKey` is stable for the same name/size/lastModified and differs when any part differs.
+- [x] `makePathKey` is prefixed (`path::`) and cannot collide with a browser file key.
 
 **`src/lib/readPickedFiles.test.js`:**
 
-- [ ] Reads real `File` objects (jsdom supports `new File([...], name)` + `file.text()`).
-- [ ] Empty/null list returns `[]`.
-- [ ] A failing read is skipped while the rest succeed (`Promise.allSettled` behavior).
+- [x] Reads real `File` objects (jsdom supports `new File([...], name)` + `file.text()`).
+- [x] Empty/null list returns `[]`.
+- [x] A failing read is skipped while the rest succeed (`Promise.allSettled` behavior).
 
 ### Phase 2 — `hooks/`
 
 **`src/hooks/useOpenFiles.test.jsx`** (via `renderHook` + `act`):
 
-- [ ] **Regression:** adding the same file twice does not duplicate it in `files`; it reactivates the existing entry (covers the fixed "duplicated files in sidebar" bug).
-- [ ] `addFiles` activates the first newly added file.
-- [ ] `addFileFromPath` dedupes by `path::` key.
-- [ ] `removeFile` removes the entry and clears `activeId` only when the removed file was active.
-- [ ] `selectFile` switches `activeId` / `activeFile`.
+- [x] **Regression:** adding the same file twice does not duplicate it in `files`; it reactivates the existing entry (covers the fixed "duplicated files in sidebar" bug).
+- [x] Overlapping reads of the same file do not create duplicate entries.
+- [x] `addFiles` activates the first picked file, including one already open.
+- [x] `addFileFromPath` dedupes by `path::` key.
+- [x] `removeFile` removes the entry and clears `activeId` only when the removed file was active.
+- [x] `selectFile` switches `activeId` / `activeFile`.
 
 **`src/hooks/useFloatingMenu.test.jsx`:**
 
-- [ ] Opens/closes via trigger; closes on outside `mousedown`.
-- [ ] `Escape` closes and returns focus to the trigger.
-- [ ] `ArrowDown`/`ArrowUp` cycle focus across `[role="menuitem"]`.
-- [ ] Note: jsdom does not do layout — `getBoundingClientRect` returns zeros, so assert behavior (open/close/focus), not pixel positions.
+- [x] Opens/closes via trigger; closes on outside `mousedown`.
+- [x] `Escape` closes and returns focus to the trigger.
+- [x] `ArrowDown`/`ArrowUp` cycle focus across `[role="menuitem"]`.
+- [x] Note: jsdom does not do layout — `getBoundingClientRect` returns zeros, so assert behavior (open/close/focus), not pixel positions.
 
 **`src/hooks/useTauriOpenFile.test.jsx`:**
 
-- [ ] In a non-Tauri environment (no `window.__TAURI_INTERNALS__`) it is a no-op — no dynamic imports happen.
-- [ ] With `__TAURI_INTERNALS__` defined and `vi.mock('@tauri-apps/api/core')` / `vi.mock('@tauri-apps/api/event')`: a pending file from `invoke('take_pending_file')` calls the handler once; `open-file` events call the handler with the payload; unmount unsubscribes.
+- [x] In a non-Tauri environment (no `window.__TAURI_INTERNALS__`) it is a no-op — no dynamic imports happen.
+- [x] With `__TAURI_INTERNALS__` defined and `vi.mock('@tauri-apps/api/core')` / `vi.mock('@tauri-apps/api/event')`: a pending file from `invoke('take_pending_file')` calls the handler once; `open-file` events call the handler with the payload; unmount unsubscribes.
 
 ### Phase 3 — Components
 
 **`MarkdownView.test.jsx`:**
 
-- [ ] Renders sanitized HTML into `.prose__body`.
-- [ ] Injects one `.code-copy` button per `<pre>` (and does not double-inject on re-render).
-- [ ] Clicking copy writes the code text to the clipboard and shows the check state (mock `navigator.clipboard.writeText`; use `vi.useFakeTimers()` for the 2s revert).
-- [ ] XSS payload in `content` does not appear in the DOM.
+- [x] Renders sanitized HTML into `.prose__body`.
+- [x] Injects one `.code-copy` button per `<pre>` (and does not double-inject on re-render).
+- [x] Clicking copy writes the code text to the clipboard and shows the check state (mock `navigator.clipboard.writeText`; use `vi.useFakeTimers()` for the 2s revert).
+- [x] XSS payload in `content` does not appear in the DOM.
 
 **`FileListItem.test.jsx`:**
 
-- [ ] Select button calls `onSelect(file.id)`.
-- [ ] Dots button opens the portal menu (`aria-expanded` toggles); "Remove file" calls `onRemove(file.id)` and closes the menu.
+- [x] Select button calls `onSelect(file.id)`.
+- [x] Dots button opens the portal menu (`aria-expanded` toggles); "Remove file" calls `onRemove(file.id)` and closes the menu.
 
 **`EmptyState.test.jsx` / `Sidebar.test.jsx`:**
 
-- [ ] EmptyState CTA calls `onOpen`.
-- [ ] Sidebar renders files, marks the active one, collapse toggle calls `onToggleCollapse` (the collapsed state already exists in `App.jsx`).
+- [x] EmptyState CTA calls `onOpen`.
+- [x] Sidebar renders files, marks the active one, collapse toggle calls `onToggleCollapse` (the collapsed state already exists in `App.jsx`).
 
 **`App.test.jsx`** (light integration, optional in this phase):
 
-- [ ] With no files: renders `EmptyState`, no sidebar.
-- [ ] Selecting files through `HiddenFileInput` lists them and shows the active document.
+- [x] With no files: renders `EmptyState`, no sidebar.
+- [x] Selecting files through `HiddenFileInput` lists them and shows the active document.
 
 ### Phase 4 — Hardening
 
-- [ ] Add `pnpm test` to CI (and to the Release Please workflow when it lands).
-- [ ] Set a coverage floor for `src/lib/**` and `src/hooks/**` (suggested: 90% lines) — **not** for icons/presentational components.
-- [ ] Decide on pre-push hook (`husky`) running `vitest run` once the suite stays < 5s.
+- [x] Add `pnpm test` to a new frontend CI workflow.
+- [ ] Add tests to Release Please when that workflow exists.
+- [ ] Set a coverage floor for `src/lib/**` and `src/hooks/**` (deferred).
+- [ ] Decide on a pre-push hook (deferred).
 
 ## 6. Conventions
 
@@ -197,7 +204,8 @@ src/
 | `scrollIntoView` | Not implemented (`useScrollActiveIntoView`) | Stub on `Element.prototype` in the tests that need it |
 | `getBoundingClientRect` | Returns zeros | Assert behavior, not coordinates (`useFloatingMenu`) |
 | `window.__TAURI_INTERNALS__` | Absent by default | Define per-test + `vi.mock('@tauri-apps/api/core')` and `vi.mock('@tauri-apps/api/event')` |
-| `File.text()` | Supported in jsdom 30 | Use real `File` objects; polyfill only if a failure appears |
+| `File.text()` | Supported in jsdom 30.1 | Use real `File` objects |
+| `HTMLElement.innerText` | Not implemented | Copy code via `textContent` |
 
 ## 8. Future work (out of scope)
 

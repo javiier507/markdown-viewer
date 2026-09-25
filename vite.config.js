@@ -1,4 +1,5 @@
-import { defineConfig } from 'vite'
+import process from 'node:process'
+import { defineConfig } from 'vitest/config'
 import react, { reactCompilerPreset } from '@vitejs/plugin-react'
 import babel from '@rolldown/plugin-babel'
 
@@ -30,6 +31,12 @@ export default defineConfig(async () => ({
 
   // Expose TAURI_ENV_* vars to the frontend in addition to VITE_*.
   envPrefix: ['VITE_', 'TAURI_ENV_*'],
+
+  test: {
+    environment: 'jsdom',
+    setupFiles: './src/test/setup.js',
+    restoreMocks: true,
+  },
 
   build: {
     // Match the WebView versions Tauri ships on each platform.
