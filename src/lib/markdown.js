@@ -18,7 +18,23 @@ marked.use(
 export function renderMarkdown(text) {
   if (!text) return ''
   // marked.parse() is synchronous here — no async extensions are configured
-  return DOMPurify.sanitize(marked.parse(text), {
-    FORBID_TAGS: ['form', 'input', 'button', 'textarea', 'select', 'option'],
+  const body = DOMPurify.sanitize(marked.parse(text), {
+    RETURN_DOM: true,
+    FORBID_TAGS: ['form', 'button', 'textarea', 'select', 'option'],
   })
+
+  body.querySelectorAll('input').forEach((input) => {
+    if (input.type !== 'checkbox' || input.parentElement?.tagName !== 'LI' || input.parentElement.firstElementChild !== input) {
+      input.remove()
+      return
+    }
+
+    const checked = input.checked
+    for (const attribute of [...input.attributes]) input.removeAttribute(attribute.name)
+    input.type = 'checkbox'
+    input.disabled = true
+    if (checked) input.setAttribute('checked', '')
+  })
+
+  return body.innerHTML
 }
