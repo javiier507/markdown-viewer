@@ -36,6 +36,33 @@ pnpm test:watch   # rerun frontend tests while developing
 pnpm test:coverage # generate a coverage report
 ```
 
+## Install as a web app (PWA)
+
+The production web app can be installed using the browser's **Install app**
+option. On iPhone and iPad, use Safari's share menu and **Add to Home Screen**.
+Installation options depend on the browser and platform. The installed app opens
+in a standalone window using the name **Markdown Viewer**.
+
+After the first online visit finishes caching the application, it can launch
+offline and open local Markdown files, including syntax highlighting and Mermaid
+diagrams. External images and other remote document resources still need a
+connection. Open documents remain in memory and must be reopened after closing
+or reloading the app; installation does not add document persistence.
+
+Updates download in the background and activate after all app windows and tabs
+are closed. They do not reload an open reading session automatically.
+
+To test locally, run `pnpm build` followed by `pnpm preview`. In browser
+DevTools, inspect **Application → Manifest**, **Service Workers**, and **Cache
+Storage**. Wait for the worker to activate and finish caching, reload once so
+the page is controlled, then simulate offline mode and reopen the app. Service
+worker registration is disabled during `pnpm dev` and inside Tauri.
+
+Deploy the entire `dist/` directory over HTTPS (localhost also works for testing).
+Serve the manifest and icons as static files, and configure `sw.js` with
+`Cache-Control: no-cache` so browsers can discover updates. When hosting under a
+subdirectory, build with Vite's `--base=/your-path/` option.
+
 ## Desktop (Tauri)
 
 ```sh

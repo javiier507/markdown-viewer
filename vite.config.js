@@ -2,6 +2,7 @@ import process from 'node:process'
 import { defineConfig } from 'vitest/config'
 import react, { reactCompilerPreset } from '@vitejs/plugin-react'
 import babel from '@rolldown/plugin-babel'
+import { VitePWA } from 'vite-plugin-pwa'
 
 const host = process.env.TAURI_DEV_HOST
 
@@ -11,6 +12,36 @@ export default defineConfig(async () => ({
   plugins: [
     react(),
     babel({ presets: [reactCompilerPreset()] }),
+    VitePWA({
+      injectRegister: false,
+      registerType: 'prompt',
+      devOptions: { enabled: false },
+      includeAssets: ['favicon.svg', 'icons.svg', 'pwa/*.png'],
+      manifest: {
+        name: 'Markdown Viewer',
+        short_name: 'Markdown Viewer',
+        description: 'Read local Markdown files with syntax highlighting and Mermaid diagrams.',
+        lang: 'en',
+        id: './',
+        start_url: './',
+        scope: './',
+        display: 'standalone',
+        theme_color: '#ffffff',
+        background_color: '#ffffff',
+        icons: [
+          { src: 'pwa/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: 'pwa/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+          { src: 'pwa/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+        ],
+      },
+      workbox: {
+        globPatterns: ['**/*.{html,js,css,svg,png,woff,woff2}'],
+        maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
+        skipWaiting: false,
+        clientsClaim: false,
+        cleanupOutdatedCaches: true,
+      },
+    }),
   ],
 
   // Don't clear the terminal so Rust compiler errors stay visible alongside Vite.
