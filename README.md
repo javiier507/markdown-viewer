@@ -14,6 +14,16 @@ A focused reader for local Markdown files. Open multiple documents, move between
 pnpm install
 ```
 
+On Fedora, install the system dependencies required for Tauri from a terminal:
+
+```sh
+bash scripts/setup-tauri-fedora.sh
+```
+
+The script uses `sudo`, which prompts for your password interactively; it does not store the password.
+Install the stable Rust toolchain separately with [rustup](https://rustup.rs/) if `cargo` is not
+available, then open a new terminal. Run `pnpm tauri info` to check the prerequisites before building.
+
 ## Web (Vite only)
 
 ```sh
@@ -36,7 +46,14 @@ pnpm tauri        # raw Tauri CLI passthrough (e.g. pnpm tauri info)
 
 `tauri:dev` runs `pnpm dev` automatically via `beforeDevCommand`, so a single command brings up everything. The first run compiles ~400 Rust crates and can take 5–15 minutes; subsequent runs are fast.
 
-Build artifacts land in `src-tauri/target/release/bundle/`.
+Build artifacts land in `src-tauri/target/release/bundle/`. On Fedora, build and install the RPM with:
+
+```sh
+pnpm tauri:build --bundles rpm
+bash scripts/install-tauri-rpm.sh
+```
+
+The installation script prompts for your password through `sudo`.
 
 ## Mermaid diagrams
 
