@@ -3,6 +3,10 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import App from './App.jsx'
 
+vi.mock('../features/reader/mermaid.js', () => ({
+  renderDiagram: vi.fn().mockResolvedValue('<svg viewBox="0 0 400 200"><text>Diagram</text></svg>'),
+}))
+
 describe('App', () => {
   afterEach(() => {
     delete Element.prototype.scrollIntoView
@@ -47,5 +51,25 @@ describe('App', () => {
     expect(screen.getByRole('button', { name: 'dropped.md' })).toBeInTheDocument()
     expect(screen.queryByText('Drop Markdown files to open')).toBeNull()
     expect(screen.queryByRole('button', { name: 'photo.png' })).toBeNull()
+  })
+
+  it('closes the diagram viewer when switching between files with identical content', async () => {
+    Element.prototype.scrollIntoView = vi.fn()
+    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() })))
+    vi.stubGlobal('ResizeObserver', class { observe() {} disconnect() {} })
+    const user = userEvent.setup()
+    const { container } = render(<App />)
+    const content = '```mermaid\nflowchart LR\nA-->B\n```'
+    await user.upload(container.querySelector('input[type="file"]'), [
+      new File([content], 'one.md', { lastModified: 1 }),
+      new File([content], 'two.md', { lastModified: 2 }),
+    ])
+    const second = await screen.findByRole('button', { name: 'two.md' })
+    await user.click(await screen.findByRole('button', { name: 'Expand diagram' }))
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    // Native file events or library state can change while the background is inert.
+    fireEvent.click(second)
+    expect(screen.queryByRole('dialog')).toBeNull()
+    expect(await screen.findByRole('button', { name: 'Expand diagram' })).toBeInTheDocument()
   })
 })

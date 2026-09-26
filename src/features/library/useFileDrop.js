@@ -19,7 +19,7 @@ export function useFileDrop(onFiles) {
     event.dataTransfer.dropEffect = 'copy'
   }
 
-  const onDragLeave = (event) => {
+  const onDragLeave = () => {
     if (depthRef.current === 0) return
     depthRef.current = Math.max(0, depthRef.current - 1)
     if (depthRef.current === 0) setIsDragging(false)

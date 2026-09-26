@@ -2,6 +2,14 @@ import { describe, expect, it } from 'vitest'
 import { renderMarkdown } from './markdown.js'
 
 describe('renderMarkdown', () => {
+  it('preserves Mermaid source as inert plain text', () => {
+    const source = 'flowchart LR\n  A["<script>alert(1)</script>"] --> B["A & B"]'
+    const container = document.createElement('div')
+    container.innerHTML = renderMarkdown('```mermaid\n' + source + '\n```')
+    const code = container.querySelector('pre > code.language-mermaid')
+    expect(code.textContent).toBe(source + '\n')
+    expect(code.querySelector('script, span')).toBeNull()
+  })
   it('renders GitHub Flavored Markdown', () => {
     const container = document.createElement('div')
     container.innerHTML = renderMarkdown('# Title\n\n~~old~~\n\n| A | B |\n| - | - |\n| 1 | 2 |')

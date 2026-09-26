@@ -38,6 +38,29 @@ pnpm tauri        # raw Tauri CLI passthrough (e.g. pnpm tauri info)
 
 Build artifacts land in `src-tauri/target/release/bundle/`.
 
+## Mermaid diagrams
+
+Fenced `mermaid` blocks render as diagrams in the web and desktop apps, including
+offline. Diagrams follow the system light/dark theme. While loading, or if a
+diagram cannot be rendered, its source remains visible and can be copied.
+
+````md
+```mermaid
+flowchart LR
+  A[Open Markdown] --> B[Read diagram]
+```
+````
+
+Diagram click actions and HTML labels are disabled.
+
+Click a diagram or its expand icon (**Expand diagram**) to open the expanded viewer.
+Use **Zoom in**, **Zoom out**, **Fit to view**, and **Actual size** to inspect it.
+Drag with a mouse or one finger to move; use the wheel or trackpad to zoom around
+the pointer. With the canvas focused, arrow keys move the diagram (Shift moves
+faster), `+`/`-` zoom, `0` fits, and `1` restores actual size. Close with Escape,
+the close button, or a click outside the modal. Closing preserves the document's
+reading position. Pinch zoom and export are not supported.
+
 ## Development guide
 
 See [CLAUDE.md](./CLAUDE.md) for repository rules and agent skills.
