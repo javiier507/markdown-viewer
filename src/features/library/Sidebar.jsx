@@ -1,5 +1,6 @@
-import PlusIcon from '../icons/PlusIcon.jsx'
-import SidebarToggleIcon from '../icons/SidebarToggleIcon.jsx'
+import './library.css'
+import PlusIcon from '../../shared/ui/icons/PlusIcon.jsx'
+import SidebarToggleIcon from '../../shared/ui/icons/SidebarToggleIcon.jsx'
 import FileList from './FileList.jsx'
 
 export default function Sidebar({

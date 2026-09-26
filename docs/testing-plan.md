@@ -2,7 +2,7 @@
 
 > **Status:** Implemented 2026-09-23 · **Scope:** Frontend (React + Vite), implemented features only · **Strategy:** Unit/integration testing with Vitest + Testing Library.
 
-The implementation is on `test/frontend-suite`: 34 tests, a frontend CI workflow, and a pnpm lockfile. `jsdom@30.1.0` replaces `30.1.1` because the latter did not meet the workspace's three-day package age policy. Coverage thresholds and a pre-push hook remain deferred. Tests also exposed four fixes: separate `file::` and `path::` key namespaces, copy code via `textContent`, forbid form controls in rendered Markdown, and deduplicate overlapping file reads.
+The test suite began on `test/frontend-suite` and currently has 35 tests, a frontend CI workflow, and a pnpm lockfile. `jsdom@30.1.0` replaces `30.1.1` because the latter did not meet the workspace's three-day package age policy. Coverage thresholds and a pre-push hook remain deferred. Tests also exposed four fixes: separate `file::` and `path::` key namespaces, copy code via `textContent`, forbid form controls in rendered Markdown, and deduplicate overlapping file reads.
 
 ## 1. Goal
 
@@ -18,7 +18,7 @@ E2E testing (Playwright) and Rust tests (`cargo test`) are explicitly **out of s
 
 Why, in short:
 
-- The codebase is already split into pure functions (`src/lib/`), hooks (`src/hooks/`), and presentational components (`src/components/`) — directly testable units.
+- Pure functions, hooks, and components are colocated by feature under `src/features/` — directly testable units.
 - The behavior worth protecting today (sanitization, file dedup, floating-menu focus handling) is DOM-level logic, not pixel-level visuals — and the same layers will absorb future features as they land.
 - The highest-risk code is the `marked → highlight.js → DOMPurify` pipeline (XSS surface) — best covered by fast unit tests with malicious payloads.
 - Playwright cannot drive the Tauri desktop shell without experimental WebDriver tooling; it would only cover the secondary web target.
@@ -46,28 +46,25 @@ Tests live next to the code they cover (colocated), plus one shared setup file:
 
 ```
 src/
-├── lib/
-│   ├── markdown.js
-│   ├── markdown.test.js
-│   ├── fileKey.js
-│   ├── fileKey.test.js
-│   ├── readPickedFiles.js
-│   └── readPickedFiles.test.js
-├── hooks/
-│   ├── useOpenFiles.js
-│   ├── useOpenFiles.test.jsx
-│   ├── useFloatingMenu.js
-│   ├── useFloatingMenu.test.jsx
+├── app/
+│   ├── App.jsx
+│   └── App.test.jsx
+├── features/
+│   ├── library/
+│   │   ├── useOpenFiles.js
+│   │   ├── useOpenFiles.test.jsx
+│   │   ├── fileKey.js
+│   │   ├── fileKey.test.js
+│   │   └── ...
+│   └── reader/
+│       ├── markdown.js
+│       ├── markdown.test.js
+│       ├── MarkdownView.jsx
+│       └── MarkdownView.test.jsx
+├── platform/tauri/
 │   ├── useTauriOpenFile.js
 │   └── useTauriOpenFile.test.jsx
-├── components/
-│   ├── MarkdownView.jsx
-│   ├── MarkdownView.test.jsx
-│   ├── FileListItem.jsx
-│   ├── FileListItem.test.jsx
-│   └── ...
-└── test/
-    └── setup.js
+└── test/setup.js
 ```
 
 ## 5. Implementation phases
@@ -108,9 +105,9 @@ src/
 - [x] Smoke test: the initial `lib/` suite passes with `pnpm test`.
 - [x] Verify `pnpm lint` stays green (explicit `vitest` imports avoid new globals).
 
-### Phase 1 — `lib/` (pure functions, highest risk first)
+### Phase 1 — Feature logic (pure functions, highest risk first)
 
-**`src/lib/markdown.test.js`** — the security-critical module:
+**`src/features/reader/markdown.test.js`** — the security-critical module:
 
 - [x] Renders GFM: headings, tables, strikethrough, fenced code blocks.
 - [x] Code blocks get `hljs language-*` classes; unknown languages fall back to `plaintext`.
@@ -121,20 +118,20 @@ src/
   - Injected `<iframe>` / `<form>` are removed.
 - [x] Empty / nullish input returns `''`.
 
-**`src/lib/fileKey.test.js`:**
+**`src/features/library/fileKey.test.js`:**
 
 - [x] `makeFileKey` is stable for the same name/size/lastModified and differs when any part differs.
 - [x] `makePathKey` is prefixed (`path::`) and cannot collide with a browser file key.
 
-**`src/lib/readPickedFiles.test.js`:**
+**`src/features/library/readPickedFiles.test.js`:**
 
 - [x] Reads real `File` objects (jsdom supports `new File([...], name)` + `file.text()`).
 - [x] Empty/null list returns `[]`.
 - [x] A failing read is skipped while the rest succeed (`Promise.allSettled` behavior).
 
-### Phase 2 — `hooks/`
+### Phase 2 — Hooks
 
-**`src/hooks/useOpenFiles.test.jsx`** (via `renderHook` + `act`):
+**`src/features/library/useOpenFiles.test.jsx`** (via `renderHook` + `act`):
 
 - [x] **Regression:** adding the same file twice does not duplicate it in `files`; it reactivates the existing entry (covers the fixed "duplicated files in sidebar" bug).
 - [x] Overlapping reads of the same file do not create duplicate entries.
@@ -143,14 +140,14 @@ src/
 - [x] `removeFile` removes the entry and clears `activeId` only when the removed file was active.
 - [x] `selectFile` switches `activeId` / `activeFile`.
 
-**`src/hooks/useFloatingMenu.test.jsx`:**
+**`src/features/library/useFloatingMenu.test.jsx`:**
 
 - [x] Opens/closes via trigger; closes on outside `mousedown`.
 - [x] `Escape` closes and returns focus to the trigger.
 - [x] `ArrowDown`/`ArrowUp` cycle focus across `[role="menuitem"]`.
 - [x] Note: jsdom does not do layout — `getBoundingClientRect` returns zeros, so assert behavior (open/close/focus), not pixel positions.
 
-**`src/hooks/useTauriOpenFile.test.jsx`:**
+**`src/platform/tauri/useTauriOpenFile.test.jsx`:**
 
 - [x] In a non-Tauri environment (no `window.__TAURI_INTERNALS__`) it is a no-op — no dynamic imports happen.
 - [x] With `__TAURI_INTERNALS__` defined and `vi.mock('@tauri-apps/api/core')` / `vi.mock('@tauri-apps/api/event')`: a pending file from `invoke('take_pending_file')` calls the handler once; `open-file` events call the handler with the payload; unmount unsubscribes.
@@ -183,7 +180,7 @@ src/
 
 - [x] Add `pnpm test` to a new frontend CI workflow.
 - [ ] Add tests to Release Please when that workflow exists.
-- [ ] Set a coverage floor for `src/lib/**` and `src/hooks/**` (deferred).
+- [ ] Set a coverage floor for feature and platform logic (deferred).
 - [ ] Decide on a pre-push hook (deferred).
 
 ## 6. Conventions

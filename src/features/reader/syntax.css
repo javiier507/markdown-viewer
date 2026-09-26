@@ -1,0 +1,145 @@
+/* Syntax highlighting (highlight.js token classes).
+   Light/dark switching via prefers-color-scheme.
+   Background is intentionally transparent so the parent <pre>'s
+   --code-bg shows through and stays consistent with the rest of the UI. */
+
+.prose__body pre code.hljs {
+  display: block; /* hljs resets this; ensure block layout */
+  background: transparent;
+  padding: 0;
+}
+
+/* Light theme tokens */
+
+.prose__body .hljs-comment,
+.prose__body .hljs-quote {
+  color: #6a737d;
+  font-style: italic;
+}
+
+.prose__body .hljs-keyword,
+.prose__body .hljs-selector-tag,
+.prose__body .hljs-doctag,
+.prose__body .hljs-formula,
+.prose__body .hljs-type {
+  color: #d73a49;
+}
+
+.prose__body .hljs-string,
+.prose__body .hljs-meta .hljs-string,
+.prose__body .hljs-regexp {
+  color: #032f62;
+}
+
+.prose__body .hljs-number,
+.prose__body .hljs-literal,
+.prose__body .hljs-section,
+.prose__body .hljs-bullet,
+.prose__body .hljs-link,
+.prose__body .hljs-attr,
+.prose__body .hljs-attribute,
+.prose__body .hljs-name {
+  color: #005cc5;
+}
+
+.prose__body .hljs-tag,
+.prose__body .hljs-selector-id,
+.prose__body .hljs-selector-class {
+  color: #22863a;
+}
+
+.prose__body .hljs-built_in,
+.prose__body .hljs-class .hljs-title,
+.prose__body .hljs-title.class_,
+.prose__body .hljs-title.function_ {
+  color: #6f42c1;
+}
+
+.prose__body .hljs-variable,
+.prose__body .hljs-template-variable,
+.prose__body .hljs-symbol,
+.prose__body .hljs-params {
+  color: #e36209;
+}
+
+.prose__body .hljs-meta,
+.prose__body .hljs-deletion {
+  color: #6a737d;
+}
+
+.prose__body .hljs-addition {
+  color: #22863a;
+  background-color: #f0fff4;
+}
+
+.prose__body .hljs-emphasis {
+  font-style: italic;
+}
+
+.prose__body .hljs-strong {
+  font-weight: 600;
+}
+
+/* Dark theme tokens */
+
+@media (prefers-color-scheme: dark) {
+  .prose__body .hljs-comment,
+  .prose__body .hljs-quote {
+    color: #8b949e;
+  }
+
+  .prose__body .hljs-keyword,
+  .prose__body .hljs-selector-tag,
+  .prose__body .hljs-doctag,
+  .prose__body .hljs-formula,
+  .prose__body .hljs-type {
+    color: #ff7b72;
+  }
+
+  .prose__body .hljs-string,
+  .prose__body .hljs-meta .hljs-string,
+  .prose__body .hljs-regexp {
+    color: #a5d6ff;
+  }
+
+  .prose__body .hljs-number,
+  .prose__body .hljs-literal,
+  .prose__body .hljs-section,
+  .prose__body .hljs-bullet,
+  .prose__body .hljs-link,
+  .prose__body .hljs-attr,
+  .prose__body .hljs-attribute,
+  .prose__body .hljs-name {
+    color: #79c0ff;
+  }
+
+  .prose__body .hljs-tag,
+  .prose__body .hljs-selector-id,
+  .prose__body .hljs-selector-class {
+    color: #7ee787;
+  }
+
+  .prose__body .hljs-built_in,
+  .prose__body .hljs-class .hljs-title,
+  .prose__body .hljs-title.class_,
+  .prose__body .hljs-title.function_ {
+    color: #d2a8ff;
+  }
+
+  .prose__body .hljs-variable,
+  .prose__body .hljs-template-variable,
+  .prose__body .hljs-symbol,
+  .prose__body .hljs-params {
+    color: #ffa657;
+  }
+
+  .prose__body .hljs-meta,
+  .prose__body .hljs-deletion {
+    color: #8b949e;
+  }
+
+  .prose__body .hljs-addition {
+    color: #7ee787;
+    background-color: rgba(46, 160, 67, 0.15);
+  }
+}

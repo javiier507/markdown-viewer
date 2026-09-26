@@ -1,8 +1,8 @@
 import { createPortal } from 'react-dom'
-import FileIcon from '../icons/FileIcon.jsx'
-import DotsIcon from '../icons/DotsIcon.jsx'
-import CloseIcon from '../icons/CloseIcon.jsx'
-import { useFloatingMenu } from '../hooks/useFloatingMenu.js'
+import FileIcon from '../../shared/ui/icons/FileIcon.jsx'
+import DotsIcon from '../../shared/ui/icons/DotsIcon.jsx'
+import CloseIcon from '../../shared/ui/icons/CloseIcon.jsx'
+import { useFloatingMenu } from './useFloatingMenu.js'
 
 export default function FileListItem({ file, isActive, itemRef, onSelect, onRemove }) {
   const { isOpen, menuPos, triggerRef, menuRef, openMenu, closeMenu, handleMenuKeyDown } =
