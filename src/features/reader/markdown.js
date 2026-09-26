@@ -9,6 +9,7 @@ marked.use(
     emptyLangClass: 'hljs',
     langPrefix: 'hljs language-',
     highlight(code, lang) {
+      if (lang === 'mermaid') return hljs.highlight(code, { language: 'plaintext' }).value
       const language = hljs.getLanguage(lang) ? lang : 'plaintext'
       return hljs.highlight(code, { language, ignoreIllegals: true }).value
     },

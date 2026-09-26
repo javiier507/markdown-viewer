@@ -2,6 +2,7 @@ import { useMemo, useEffect, useRef } from 'react'
 import './reader.css'
 import './syntax.css'
 import { renderMarkdown } from './markdown.js'
+import { renderDiagram } from './mermaid.js'
 
 const COPY_ICON = `<svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
   <rect x="5" y="5" width="9" height="9" rx="2" stroke="currentColor" stroke-width="1.5"/>
@@ -14,12 +15,16 @@ const CHECK_ICON = `<svg width="14" height="14" viewBox="0 0 16 16" fill="none" 
 
 export default function MarkdownView({ content }) {
   const html = useMemo(() => renderMarkdown(content), [content])
+  // Keep this prop stable so React does not reset enhanced DOM on unrelated renders.
+  const markup = useMemo(() => ({ __html: html }), [html])
   const bodyRef = useRef(null)
 
   useEffect(() => {
     if (!bodyRef.current) return
     const blocks = bodyRef.current.querySelectorAll('pre')
     const timers = []
+    const buttons = []
+    let active = true
 
     blocks.forEach((pre) => {
       // avoid double-injecting on re-renders
@@ -35,6 +40,7 @@ export default function MarkdownView({ content }) {
         const code = pre.querySelector('code')
         const text = code ? code.textContent : pre.textContent
         navigator.clipboard.writeText(text).then(() => {
+          if (!active) return
           btn.innerHTML = CHECK_ICON
           btn.classList.add('code-copy--copied')
           const t = setTimeout(() => {
@@ -42,13 +48,67 @@ export default function MarkdownView({ content }) {
             btn.classList.remove('code-copy--copied')
           }, 2000)
           timers.push(t)
+        }).catch(() => {
+          if (active) btn.setAttribute('aria-label', 'Could not copy code')
         })
       })
 
       pre.appendChild(btn)
+      buttons.push(btn)
     })
 
-    return () => timers.forEach(clearTimeout)
+    return () => {
+      active = false
+      timers.forEach(clearTimeout)
+      buttons.forEach((button) => button.remove())
+    }
+  }, [html])
+
+  useEffect(() => {
+    const body = bodyRef.current
+    const blocks = [...body.querySelectorAll('pre > code.language-mermaid')].map((code) => ({
+      source: code.textContent,
+      pre: code.parentElement,
+      figure: null,
+    }))
+    if (!blocks.length) return
+
+    const media = window.matchMedia('(prefers-color-scheme: dark)')
+    let generation = 0
+    let active = true
+
+    const render = () => {
+      const current = ++generation
+      const isCurrent = () => active && generation === current
+      blocks.forEach((block) => {
+        renderDiagram(block.source, media.matches, isCurrent).then((svg) => {
+          if (!isCurrent() || !svg) return
+          const figure = document.createElement('figure')
+          figure.className = 'prose__mermaid'
+          figure.innerHTML = svg
+          const diagram = figure.querySelector('svg')
+          diagram.setAttribute('role', 'img')
+          if (!diagram.hasAttribute('aria-labelledby') && !diagram.hasAttribute('aria-label')) {
+            diagram.setAttribute('aria-label', 'Mermaid diagram')
+          }
+          const previous = block.figure || block.pre
+          previous.replaceWith(figure)
+          block.figure = figure
+        }).catch(() => {
+          if (!isCurrent() || !block.figure) return
+          block.figure.replaceWith(block.pre)
+          block.figure = null
+        })
+      })
+    }
+
+    render()
+    media.addEventListener('change', render)
+    return () => {
+      active = false
+      media.removeEventListener('change', render)
+      blocks.forEach((block) => block.figure?.replaceWith(block.pre))
+    }
   }, [html])
 
   return (
@@ -56,7 +116,7 @@ export default function MarkdownView({ content }) {
       <div
         ref={bodyRef}
         className="prose__body"
-        dangerouslySetInnerHTML={{ __html: html }}
+        dangerouslySetInnerHTML={markup}
       />
     </article>
   )

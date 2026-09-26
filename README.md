@@ -38,6 +38,21 @@ pnpm tauri        # raw Tauri CLI passthrough (e.g. pnpm tauri info)
 
 Build artifacts land in `src-tauri/target/release/bundle/`.
 
+## Mermaid diagrams
+
+Fenced `mermaid` blocks render as diagrams in the web and desktop apps, including
+offline. Diagrams follow the system light/dark theme. While loading, or if a
+diagram cannot be rendered, its source remains visible and can be copied.
+
+````md
+```mermaid
+flowchart LR
+  A[Open Markdown] --> B[Read diagram]
+```
+````
+
+Diagram click actions and HTML labels are disabled.
+
 ## Development guide
 
 See [CLAUDE.md](./CLAUDE.md) for repository rules and agent skills.
