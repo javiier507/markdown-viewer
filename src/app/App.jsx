@@ -3,6 +3,8 @@ import './App.css'
 import { useOpenFiles } from '../features/library/useOpenFiles.js'
 import { useScrollActiveIntoView } from '../features/library/useScrollActiveIntoView.js'
 import { useTauriOpenFile } from '../platform/tauri/useTauriOpenFile.js'
+import { useTauriFileDrop } from '../platform/tauri/useTauriFileDrop.js'
+import { useFileDrop } from '../features/library/useFileDrop.js'
 import HiddenFileInput from '../features/library/HiddenFileInput.jsx'
 import Sidebar from '../features/library/Sidebar.jsx'
 import MarkdownView from '../features/reader/MarkdownView.jsx'
@@ -15,6 +17,7 @@ function App() {
     activeFile,
     addFiles,
     addFileFromPath,
+    addFilesFromPaths,
     removeFile,
     selectFile,
   } = useOpenFiles()
@@ -23,12 +26,14 @@ function App() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
 
   useTauriOpenFile(addFileFromPath)
+  const nativeDragging = useTauriFileDrop(addFilesFromPaths)
+  const { isDragging, ...dropHandlers } = useFileDrop(addFiles)
 
   const openFilePicker = () => fileInputRef.current?.click()
   const hasFiles = files.length > 0
 
   return (
-    <div className={`app ${hasFiles ? '' : 'app--empty'}`}>
+    <div className={`app ${hasFiles ? '' : 'app--empty'}`} {...dropHandlers}>
       <HiddenFileInput ref={fileInputRef} onFilesSelected={addFiles} />
 
       {hasFiles && (
@@ -51,6 +56,11 @@ function App() {
           <EmptyState onOpen={openFilePicker} />
         )}
       </main>
+      {(isDragging || nativeDragging) && (
+        <div className="app__drop-overlay" aria-hidden="true">
+          <div className="app__drop-message">Drop Markdown files to open</div>
+        </div>
+      )}
     </div>
   )
 }

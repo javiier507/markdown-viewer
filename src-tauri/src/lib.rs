@@ -48,6 +48,29 @@ fn take_pending_file(
     read_file_payload(&path).map(Some)
 }
 
+#[tauri::command]
+fn read_dropped_files(paths: Vec<String>) -> Vec<OpenFilePayload> {
+    let mut files = Vec::new();
+    for path in paths {
+        let supported = Path::new(&path)
+            .extension()
+            .and_then(|extension| extension.to_str())
+            .is_some_and(|extension| {
+                ["md", "markdown", "mdx", "txt"]
+                    .iter()
+                    .any(|allowed| extension.eq_ignore_ascii_case(allowed))
+            });
+        if !supported {
+            continue;
+        }
+        match read_file_payload(&path) {
+            Ok(file) => files.push(file),
+            Err(error) => eprintln!("file drop skipped: {}", error),
+        }
+    }
+    files
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let mut builder = tauri::Builder::default();
@@ -72,7 +95,7 @@ pub fn run() {
 
     builder
         .manage(PendingFile::default())
-        .invoke_handler(tauri::generate_handler![take_pending_file])
+        .invoke_handler(tauri::generate_handler![take_pending_file, read_dropped_files])
         .setup(|app| {
             if cfg!(debug_assertions) {
                 app.handle().plugin(

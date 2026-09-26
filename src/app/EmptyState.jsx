@@ -9,7 +9,7 @@ export default function EmptyState({ onOpen }) {
       </div>
       <h1 className="empty-state__title">Markdown Viewer</h1>
       <p className="empty-state__hint">
-        Open a markdown file to start reading.
+        Open a markdown file or drop it here to start reading.
       </p>
       <button
         type="button"

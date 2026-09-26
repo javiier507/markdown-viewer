@@ -6,6 +6,19 @@ const makeFile = (name, content = name) =>
   new File([content], name, { lastModified: 123 })
 
 describe('useOpenFiles', () => {
+  it('opens multiple native paths and selects the first, including existing files', () => {
+    const { result } = renderHook(useOpenFiles)
+    const first = { path: '/first.md', name: 'first.md', content: 'first' }
+    const second = { path: '/second.md', name: 'second.md', content: 'second' }
+
+    act(() => result.current.addFilesFromPaths([first, second]))
+    expect(result.current.files).toHaveLength(2)
+    expect(result.current.activeFile.name).toBe('first.md')
+
+    act(() => result.current.addFilesFromPaths([second, first]))
+    expect(result.current.files).toHaveLength(2)
+    expect(result.current.activeFile.name).toBe('second.md')
+  })
   it('reactivates an existing browser file instead of duplicating it', async () => {
     const { result } = renderHook(useOpenFiles)
     const first = makeFile('first.md')

@@ -39,18 +39,29 @@ export function useOpenFiles() {
     }
   }
 
-  const addFileFromPath = ({ path, name, content }) => {
-    const key = makePathKey(path)
-    const existing = filesRef.current.find((f) => f.key === key)
-    if (existing) {
-      setActiveId(existing.id)
-      return
+  const addFilesFromPaths = (payloads) => {
+    if (payloads.length === 0) return
+    const existingKeys = new Map(filesRef.current.map((f) => [f.key, f.id]))
+    const additions = []
+    let firstId = null
+    for (const { path, name, content } of payloads) {
+      const key = makePathKey(path)
+      let id = existingKeys.get(key)
+      if (id == null) {
+        id = nextIdRef.current++
+        additions.push({ id, name, key, content })
+        existingKeys.set(key, id)
+      }
+      if (firstId == null) firstId = id
     }
-    const id = nextIdRef.current++
-    setActiveId(id)
-    filesRef.current = [...filesRef.current, { id, name, key, content }]
-    setFiles(filesRef.current)
+    setActiveId(firstId)
+    if (additions.length > 0) {
+      filesRef.current = [...filesRef.current, ...additions]
+      setFiles(filesRef.current)
+    }
   }
+
+  const addFileFromPath = (payload) => addFilesFromPaths([payload])
 
   const removeFile = (id) => {
     filesRef.current = filesRef.current.filter((f) => f.id !== id)
@@ -66,6 +77,7 @@ export function useOpenFiles() {
     activeFile,
     addFiles,
     addFileFromPath,
+    addFilesFromPaths,
     removeFile,
     selectFile,
   }
