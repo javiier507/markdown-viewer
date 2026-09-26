@@ -1,5 +1,5 @@
 import { StrictMode } from 'react'
-import { act, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import MarkdownView from './MarkdownView.jsx'
 import { renderDiagram } from './mermaid.js'
@@ -18,10 +18,53 @@ beforeEach(() => {
     removeEventListener: vi.fn((event, listener) => listeners.delete(listener)),
   }
   vi.stubGlobal('matchMedia', vi.fn(() => media))
+  vi.stubGlobal('ResizeObserver', class { observe() {} disconnect() {} })
   vi.mocked(renderDiagram).mockReset().mockResolvedValue('<svg><text>Graph</text></svg>')
 })
 
 describe('Mermaid document enhancements', () => {
+  it('opens the selected diagram from its button or graphic and restores focus', async () => {
+    vi.mocked(renderDiagram).mockResolvedValue('<svg viewBox="0 0 400 200"><text>Graph</text></svg>')
+    const second = '```mermaid\nsequenceDiagram\nA->>B: Hello\n```'
+    const { container } = render(<MarkdownView content={flow + '\n\n' + second} />)
+    const buttons = await screen.findAllByRole('button', { name: 'Expand diagram' })
+    buttons[1].focus()
+    fireEvent.click(buttons[1])
+    expect(screen.getByRole('dialog', { name: 'Mermaid diagram' })).toBeInTheDocument()
+    await waitFor(() => expect(renderDiagram).toHaveBeenLastCalledWith('sequenceDiagram\nA->>B: Hello\n', false, expect.any(Function)))
+    fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' })
+    expect(screen.queryByRole('dialog')).toBeNull()
+    expect(buttons[1]).toHaveFocus()
+    fireEvent.click(container.querySelector('.prose__mermaid svg'))
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    await waitFor(() => expect(renderDiagram).toHaveBeenLastCalledWith('flowchart LR\nA-->B\n', false, expect.any(Function)))
+    fireEvent.click(screen.getByRole('button', { name: 'Close diagram' }))
+    expect(buttons[0]).toHaveFocus()
+  })
+
+  it('restores focus to the regenerated expand button after a theme change', async () => {
+    vi.mocked(renderDiagram).mockResolvedValue('<svg viewBox="0 0 400 200"><text>Graph</text></svg>')
+    render(<MarkdownView content={flow} />)
+    const oldButton = await screen.findByRole('button', { name: 'Expand diagram' })
+    fireEvent.click(oldButton)
+    media.matches = true
+    await act(async () => listeners.forEach((listener) => listener()))
+    fireEvent.click(screen.getByRole('button', { name: 'Close diagram' }))
+    expect(oldButton.isConnected).toBe(false)
+    expect(screen.getByRole('button', { name: 'Expand diagram' })).toHaveFocus()
+  })
+
+  it('closes the viewer when content changes and does not reopen when content returns', async () => {
+    vi.mocked(renderDiagram).mockResolvedValue('<svg viewBox="0 0 400 200"><text>Graph</text></svg>')
+    const { rerender } = render(<MarkdownView content={flow} />)
+    fireEvent.click(await screen.findByRole('button', { name: 'Expand diagram' }))
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    rerender(<MarkdownView content="# New document" />)
+    expect(screen.queryByRole('dialog')).toBeNull()
+    rerender(<MarkdownView content={flow} />)
+    await screen.findByRole('button', { name: 'Expand diagram' })
+    expect(screen.queryByRole('dialog')).toBeNull()
+  })
   it('replaces multiple Mermaid blocks while preserving ordinary code', async () => {
     const { container, rerender } = render(<MarkdownView content={flow + '\n\n' + flow + '\n\n```js\nconst x = 1\n```'} />)
     await waitFor(() => expect(screen.getAllByRole('img', { name: 'Mermaid diagram' })).toHaveLength(2))
@@ -50,6 +93,7 @@ describe('Mermaid document enhancements', () => {
     expect(container.querySelector('pre')).toHaveTextContent('flowchart LR')
     expect(screen.getByRole('button', { name: 'Copy code' })).toBeInTheDocument()
     expect(container.querySelector('figure')).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Expand diagram' })).toBeNull()
   })
 
   it('ignores a result from a previous document', async () => {

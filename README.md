@@ -53,6 +53,14 @@ flowchart LR
 
 Diagram click actions and HTML labels are disabled.
 
+Click a diagram or its expand icon (**Expand diagram**) to open the expanded viewer.
+Use **Zoom in**, **Zoom out**, **Fit to view**, and **Actual size** to inspect it.
+Drag with a mouse or one finger to move; use the wheel or trackpad to zoom around
+the pointer. With the canvas focused, arrow keys move the diagram (Shift moves
+faster), `+`/`-` zoom, `0` fits, and `1` restores actual size. Close with Escape,
+the close button, or a click outside the modal. Closing preserves the document's
+reading position. Pinch zoom and export are not supported.
+
 ## Development guide
 
 See [CLAUDE.md](./CLAUDE.md) for repository rules and agent skills.

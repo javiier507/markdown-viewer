@@ -51,7 +51,7 @@ function App() {
 
       <main className="content">
         {activeFile ? (
-          <MarkdownView content={activeFile.content} />
+          <MarkdownView key={activeId} content={activeFile.content} />
         ) : (
           <EmptyState onOpen={openFilePicker} />
         )}
