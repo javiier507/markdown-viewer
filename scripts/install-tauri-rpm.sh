@@ -20,6 +20,15 @@ if [[ ! -f "$rpm_file" ]]; then
   exit 1
 fi
 
+package_name="$(rpm -qp --queryformat '%{NAME}' "$rpm_file")"
+package_version="$(rpm -qp --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}' "$rpm_file")"
+installed_version="$(rpm -q --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}' "$package_name" 2>/dev/null || true)"
+
 echo "Installing $rpm_file"
 sudo -v
-sudo dnf install "$rpm_file"
+if [[ "$installed_version" == "$package_version" ]]; then
+  # dnf install is a no-op when this version is already installed.
+  sudo dnf reinstall "$rpm_file"
+else
+  sudo dnf install "$rpm_file"
+fi

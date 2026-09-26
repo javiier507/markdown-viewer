@@ -2,9 +2,51 @@ use serde::Serialize;
 use std::fs;
 use std::path::Path;
 use std::sync::Mutex;
-use tauri::Manager;
 #[cfg(desktop)]
 use tauri::Emitter;
+use tauri::Manager;
+
+#[cfg(target_os = "linux")]
+mod linux_theme {
+    use gio::prelude::*;
+    use std::cell::RefCell;
+    use tauri::{Manager, Theme};
+
+    thread_local! {
+        static SETTINGS: RefCell<Option<gio::Settings>> = const { RefCell::new(None) };
+    }
+
+    pub fn follow_gnome_color_scheme(app: &tauri::App) {
+        let Some(schema) = gio::SettingsSchemaSource::default()
+            .and_then(|source| source.lookup("org.gnome.desktop.interface", true))
+        else {
+            return;
+        };
+        if !schema.has_key("color-scheme") {
+            return;
+        }
+
+        let Some(window) = app.get_webview_window("main") else {
+            return;
+        };
+        let settings = gio::Settings::new("org.gnome.desktop.interface");
+        let update_theme = move |settings: &gio::Settings| {
+            let theme = match settings.string("color-scheme").as_str() {
+                "prefer-dark" => Theme::Dark,
+                _ => Theme::Light,
+            };
+            if let Err(error) = window.set_theme(Some(theme)) {
+                eprintln!("failed to update window theme: {error}");
+            }
+        };
+        update_theme(&settings);
+        settings.connect_changed(Some("color-scheme"), move |settings, _| {
+            update_theme(settings)
+        });
+        // Keep the GSettings subscription alive for the lifetime of the GTK main thread.
+        SETTINGS.with(|slot| *slot.borrow_mut() = Some(settings));
+    }
+}
 
 #[derive(Clone, Serialize)]
 struct OpenFilePayload {
@@ -97,6 +139,9 @@ pub fn run() {
         .manage(PendingFile::default())
         .invoke_handler(tauri::generate_handler![take_pending_file, read_dropped_files])
         .setup(|app| {
+            #[cfg(target_os = "linux")]
+            linux_theme::follow_gnome_color_scheme(app);
+
             if cfg!(debug_assertions) {
                 app.handle().plugin(
                     tauri_plugin_log::Builder::default()
