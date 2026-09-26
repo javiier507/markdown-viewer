@@ -22,3 +22,5 @@
 - [ ] Open folder and diplay it in sidbear.
 - [ ] show 3 categories in sidebar: files, folders, draft files.
 - [ ] Add new skill for developing new features: how to fit new features (quality code), TDD, etc
+- [ ] Add PWA support
+- [ ] Generate builds with Github Action
