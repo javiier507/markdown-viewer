@@ -1,8 +1,6 @@
 .prose {
-  max-width: 980px;
   width: 100%;
-  margin: 0 auto;
-  padding: 56px clamp(20px, 5%, 64px) 96px;
+  padding: 24px;
 }
 
 .prose__body {
