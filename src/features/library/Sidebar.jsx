@@ -48,7 +48,8 @@ export default function Sidebar({
           aria-controls="sidebar-content"
           aria-expanded={!isCollapsed}
           aria-label={toggleLabel}
-          title={toggleLabel}
+          aria-keyshortcuts="Control+b"
+          title={`${toggleLabel} (Ctrl+B)`}
         >
           <SidebarToggleIcon isCollapsed={isCollapsed} />
         </button>

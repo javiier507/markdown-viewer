@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { createEvent, fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import App from './App.jsx'
@@ -31,6 +31,60 @@ describe('App', () => {
     expect(screen.getByRole('button', { name: 'first.md' })).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'second.md' }))
     expect(screen.getByRole('heading', { name: 'Second document' })).toBeInTheDocument()
+  })
+
+  it('toggles the sidebar with Ctrl+B and shares state with the button', async () => {
+    Element.prototype.scrollIntoView = vi.fn()
+    const user = userEvent.setup()
+    const { container, unmount } = render(<App />)
+    const emptyShortcut = createEvent.keyDown(window, { key: 'b', ctrlKey: true })
+    fireEvent(window, emptyShortcut)
+    expect(emptyShortcut.defaultPrevented).toBe(false)
+
+    await user.upload(container.querySelector('input[type="file"]'), new File(['# Document'], 'doc.md'))
+    const shortcut = createEvent.keyDown(window, { key: 'b', ctrlKey: true })
+    fireEvent(window, shortcut)
+    expect(shortcut.defaultPrevented).toBe(true)
+    expect(screen.getByRole('button', { name: 'Expand sidebar' })).toHaveAttribute('aria-expanded', 'false')
+    fireEvent.keyDown(window, { key: 'b', ctrlKey: true })
+    await user.click(screen.getByRole('button', { name: 'Collapse sidebar' }))
+    fireEvent.keyDown(window, { key: 'B', ctrlKey: true })
+    expect(screen.getByRole('button', { name: 'Collapse sidebar' })).toHaveAttribute('aria-expanded', 'true')
+
+    unmount()
+    const afterUnmount = createEvent.keyDown(window, { key: 'b', ctrlKey: true })
+    fireEvent(window, afterUnmount)
+    expect(afterUnmount.defaultPrevented).toBe(false)
+  })
+
+  it('ignores other keys, modifiers, repeats, handled events and editable targets', async () => {
+    Element.prototype.scrollIntoView = vi.fn()
+    const user = userEvent.setup()
+    const { container } = render(<App />)
+    await user.upload(container.querySelector('input[type="file"]'), new File(['# Document'], 'doc.md'))
+
+    for (const options of [
+      { ctrlKey: false }, { key: 'a' }, { altKey: true }, { shiftKey: true },
+      { metaKey: true }, { repeat: true }, { isComposing: true },
+    ]) {
+      const event = createEvent.keyDown(window, { key: 'b', ctrlKey: true, ...options })
+      fireEvent(window, event)
+      expect(event.defaultPrevented).toBe(false)
+    }
+    const handled = createEvent.keyDown(window, { key: 'b', ctrlKey: true })
+    handled.preventDefault()
+    fireEvent(window, handled)
+
+    for (const tag of ['input', 'textarea', 'select', 'div']) {
+      const editable = document.createElement(tag)
+      if (tag === 'div') editable.setAttribute('contenteditable', 'true')
+      container.append(editable)
+      const event = createEvent.keyDown(editable, { key: 'b', ctrlKey: true })
+      fireEvent(editable, event)
+      expect(event.defaultPrevented).toBe(false)
+      editable.remove()
+    }
+    expect(screen.getByRole('button', { name: 'Collapse sidebar' })).toHaveAttribute('aria-expanded', 'true')
   })
 
   it('opens supported dropped files and ignores other files', async () => {

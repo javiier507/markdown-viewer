@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import './App.css'
 import { useOpenFiles } from '../features/library/useOpenFiles.js'
 import { useScrollActiveIntoView } from '../features/library/useScrollActiveIntoView.js'
@@ -31,6 +31,28 @@ function App() {
 
   const openFilePicker = () => fileInputRef.current?.click()
   const hasFiles = files.length > 0
+  const toggleSidebar = useCallback(() => {
+    setIsSidebarCollapsed((isCollapsed) => !isCollapsed)
+  }, [])
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (!hasFiles || event.defaultPrevented || event.repeat || event.isComposing
+        || !event.ctrlKey || event.altKey || event.shiftKey || event.metaKey
+        || event.key.toLowerCase() !== 'b') return
+
+      const target = event.target
+      if (target instanceof HTMLElement
+        && (target.closest('input, textarea, select') || target.isContentEditable
+          || target.closest('[contenteditable]:not([contenteditable="false"])'))) return
+
+      event.preventDefault()
+      toggleSidebar()
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [hasFiles, toggleSidebar])
 
   return (
     <div className={`app ${hasFiles ? '' : 'app--empty'}`} {...dropHandlers}>
@@ -45,7 +67,7 @@ function App() {
           onAdd={openFilePicker}
           onSelect={selectFile}
           onRemove={removeFile}
-          onToggleCollapse={() => setIsSidebarCollapsed((isCollapsed) => !isCollapsed)}
+          onToggleCollapse={toggleSidebar}
         />
       )}
 
