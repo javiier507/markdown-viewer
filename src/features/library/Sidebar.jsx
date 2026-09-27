@@ -4,6 +4,7 @@ import SidebarToggleIcon from '../../shared/ui/icons/SidebarToggleIcon.jsx'
 import FileList from './FileList.jsx'
 
 export default function Sidebar({
+  ref,
   files,
   activeId,
   activeItemRef,
@@ -16,7 +17,7 @@ export default function Sidebar({
   const toggleLabel = isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'
 
   return (
-    <aside className={`sidebar${isCollapsed ? ' sidebar--collapsed' : ''}`}>
+    <aside ref={ref} className={`sidebar${isCollapsed ? ' sidebar--collapsed' : ''}`}>
       <div id="sidebar-content" className="sidebar__content" hidden={isCollapsed}>
         <header className="sidebar__header">
           <h2 className="sidebar__title">Files</h2>

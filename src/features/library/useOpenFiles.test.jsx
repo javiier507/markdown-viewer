@@ -6,6 +6,21 @@ const makeFile = (name, content = name) =>
   new File([content], name, { lastModified: 123 })
 
 describe('useOpenFiles', () => {
+  it('reports successful openings and ignores empty, unsupported and unreadable files', async () => {
+    const { result } = renderHook(useOpenFiles)
+    await act(async () => {
+      expect(await result.current.addFiles([])).toBe(false)
+      expect(await result.current.addFiles([makeFile('photo.png')])).toBe(false)
+      expect(await result.current.addFiles([{ name: 'broken.md', text: () => Promise.reject(new Error('unreadable')) }])).toBe(false)
+      const file = makeFile('one.md')
+      expect(await result.current.addFiles([file])).toBe(true)
+      expect(await result.current.addFiles([file])).toBe(true)
+    })
+    act(() => {
+      expect(result.current.addFilesFromPaths([])).toBe(false)
+      expect(result.current.addFileFromPath({ path: '/native.md', name: 'native.md', content: 'native' })).toBe(true)
+    })
+  })
   it('opens multiple native paths and selects the first, including existing files', () => {
     const { result } = renderHook(useOpenFiles)
     const first = { path: '/first.md', name: 'first.md', content: 'first' }

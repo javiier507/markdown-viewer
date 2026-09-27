@@ -1,6 +1,6 @@
 import { createEvent, fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import App from './App.jsx'
 
 vi.mock('../features/reader/mermaid.js', () => ({
@@ -8,8 +8,59 @@ vi.mock('../features/reader/mermaid.js', () => ({
 }))
 
 describe('App', () => {
+  beforeEach(() => {
+    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() })))
+  })
+
   afterEach(() => {
     delete Element.prototype.scrollIntoView
+    vi.unstubAllGlobals()
+  })
+
+  it.each([1024, 1025])('applies automatic collapse at a viewport width of %i', async (width) => {
+    Element.prototype.scrollIntoView = vi.fn()
+    let viewportWidth = width
+    vi.stubGlobal('matchMedia', vi.fn((query) => ({
+      matches: query === '(max-width: 1024px)' && viewportWidth <= 1024,
+      addEventListener: vi.fn(), removeEventListener: vi.fn(),
+    })))
+    const user = userEvent.setup()
+    const { container } = render(<App />)
+    const input = container.querySelector('input[type="file"]')
+    const files = [new File(['# First'], 'first.md'), new File(['# Second'], 'second.md')]
+    await user.upload(input, files)
+    expect(container.querySelector('.sidebar')).toHaveClass(width <= 1024 ? 'sidebar--collapsed' : 'sidebar')
+    if (width > 1024) expect(container.querySelector('.sidebar')).not.toHaveClass('sidebar--collapsed')
+
+    if (width <= 1024) await user.click(screen.getByRole('button', { name: 'Expand sidebar' }))
+    const activeRow = screen.getByRole('button', { name: 'first.md' })
+    activeRow.focus()
+    await user.click(activeRow)
+    expect(screen.getByRole('button', { name: width <= 1024 ? 'Expand sidebar' : 'Collapse sidebar' }))
+      .toHaveAttribute('aria-expanded', width <= 1024 ? 'false' : 'true')
+    if (width <= 1024) {
+      expect(screen.getByRole('button', { name: 'Expand sidebar' })).toHaveFocus()
+      await user.click(screen.getByRole('button', { name: 'Expand sidebar' }))
+    }
+
+    viewportWidth = 1024
+    fireEvent(window, new Event('resize'))
+    expect(screen.getByRole('button', { name: 'Collapse sidebar' })).toBeInTheDocument()
+    await user.upload(input, [files[0]])
+    expect(screen.getByRole('button', { name: 'Expand sidebar' })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Expand sidebar' }))
+    await user.click(screen.getByRole('button', { name: 'second.md' }))
+    expect(screen.getByRole('heading', { name: 'Second' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Expand sidebar' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Expand sidebar' }))
+    const app = container.querySelector('.app')
+    fireEvent.drop(app, { dataTransfer: { types: ['Files'], files: [new File(['image'], 'photo.png')] } })
+    fireEvent.change(input, { target: { files: [] } })
+    expect(screen.getByRole('button', { name: 'Collapse sidebar' })).toBeInTheDocument()
+    fireEvent.drop(app, { dataTransfer: { types: ['Files'], files: [new File(['# Dropped'], 'drop.md')] } })
+    await screen.findByRole('heading', { name: 'Dropped' })
+    expect(screen.getByRole('button', { name: 'Expand sidebar' })).toBeInTheDocument()
   })
 
   it('shows the empty state without a sidebar when no file is open', () => {

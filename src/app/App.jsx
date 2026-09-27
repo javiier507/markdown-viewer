@@ -24,10 +24,34 @@ function App() {
   const activeItemRef = useScrollActiveIntoView(activeId)
   const fileInputRef = useRef(null)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
+  const sidebarRef = useRef(null)
 
-  useTauriOpenFile(addFileFromPath)
-  const nativeDragging = useTauriFileDrop(addFilesFromPaths)
-  const { isDragging, ...dropHandlers } = useFileDrop(addFiles)
+  const collapseSidebarOnCompactScreen = () => {
+    if (!window.matchMedia('(max-width: 1024px)').matches) return
+    const sidebar = sidebarRef.current
+    if (sidebar?.querySelector('.sidebar__content')?.contains(document.activeElement)) {
+      sidebar.querySelector('.sidebar__toggle')?.focus()
+    }
+    setIsSidebarCollapsed(true)
+  }
+
+  const openFiles = async (fileList) => {
+    if (await addFiles(fileList)) collapseSidebarOnCompactScreen()
+  }
+  const openFileFromPath = (payload) => {
+    if (addFileFromPath(payload)) collapseSidebarOnCompactScreen()
+  }
+  const openFilesFromPaths = (payloads) => {
+    if (addFilesFromPaths(payloads)) collapseSidebarOnCompactScreen()
+  }
+  const selectDocument = (id) => {
+    selectFile(id)
+    collapseSidebarOnCompactScreen()
+  }
+
+  useTauriOpenFile(openFileFromPath)
+  const nativeDragging = useTauriFileDrop(openFilesFromPaths)
+  const { isDragging, ...dropHandlers } = useFileDrop(openFiles)
 
   const openFilePicker = () => fileInputRef.current?.click()
   const hasFiles = files.length > 0
@@ -56,16 +80,17 @@ function App() {
 
   return (
     <div className={`app ${hasFiles ? '' : 'app--empty'}`} {...dropHandlers}>
-      <HiddenFileInput ref={fileInputRef} onFilesSelected={addFiles} />
+      <HiddenFileInput ref={fileInputRef} onFilesSelected={openFiles} />
 
       {hasFiles && (
         <Sidebar
+          ref={sidebarRef}
           files={files}
           activeId={activeId}
           activeItemRef={activeItemRef}
           isCollapsed={isSidebarCollapsed}
           onAdd={openFilePicker}
-          onSelect={selectFile}
+          onSelect={selectDocument}
           onRemove={removeFile}
           onToggleCollapse={toggleSidebar}
         />
