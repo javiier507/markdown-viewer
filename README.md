@@ -82,6 +82,21 @@ bash scripts/install-tauri-rpm.sh
 
 The installation script prompts for your password through `sudo`.
 
+## Document anchors
+
+Links such as `[Installation](#installation)` jump to a heading in the current
+document and move keyboard focus to it, without changing the app URL or browser
+history. `#` jumps to the beginning of the document.
+
+Heading anchors use lowercase visible text, remove punctuation, and replace
+spaces with hyphens. Unicode letters and accents are preserved: `## Instalación
+rápida` becomes `#instalación-rápida`. Repeated headings receive suffixes such as
+`#installation-1`. Empty heading names use `#section`.
+
+Explicit HTML destinations such as `<a id="details"></a>` and
+`<a name="details"></a>` are also supported. Generated heading IDs avoid these
+names. Links to missing destinations leave the reading position unchanged.
+
 ## Mermaid diagrams
 
 Fenced `mermaid` blocks render as diagrams in the web and desktop apps, including

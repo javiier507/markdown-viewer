@@ -2,6 +2,7 @@ import { useMemo, useEffect, useRef, useState, useCallback } from 'react'
 import './reader.css'
 import './syntax.css'
 import { renderMarkdown } from './markdown.js'
+import { attachAnchorNavigation } from './anchors.js'
 import { renderDiagram } from './mermaid.js'
 import MermaidDiagramModal from './MermaidDiagramModal.jsx'
 
@@ -26,6 +27,8 @@ export default function MarkdownView({ content }) {
   const [selectedDiagram, setSelectedDiagram] = useState(null)
   const closeDiagram = useCallback(() => setSelectedDiagram(null), [])
   if (selectedDiagram && selectedDiagram.html !== html) setSelectedDiagram(null)
+
+  useEffect(() => attachAnchorNavigation(bodyRef.current), [html])
 
   useEffect(() => {
     if (!bodyRef.current) return

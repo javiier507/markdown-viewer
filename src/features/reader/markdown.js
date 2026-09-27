@@ -24,6 +24,21 @@ export function renderMarkdown(text) {
     FORBID_TAGS: ['form', 'button', 'textarea', 'select', 'option'],
   })
 
+  const reserved = new Set([...body.querySelectorAll('[id], a[name]')]
+    .flatMap((element) => [element.getAttribute('id'), element.getAttribute('name')])
+    .filter(Boolean))
+  body.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach((heading) => {
+    if (heading.id) return
+    const base = heading.textContent.toLowerCase()
+      .replace(/[^\p{L}\p{M}\p{N}\s_-]/gu, '')
+      .trim().replace(/\s+/g, '-') || 'section'
+    let id = base
+    let suffix = 0
+    while (reserved.has(id)) id = `${base}-${++suffix}`
+    heading.id = id
+    reserved.add(id)
+  })
+
   body.querySelectorAll('input').forEach((input) => {
     if (input.type !== 'checkbox' || input.parentElement?.tagName !== 'LI' || input.parentElement.firstElementChild !== input) {
       input.remove()

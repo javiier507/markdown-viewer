@@ -9,6 +9,19 @@
   line-height: 1.7;
 }
 
+.prose__body,
+.prose__body [id],
+.prose__body a[name] {
+  scroll-margin-top: 16px;
+}
+
+.prose__body:focus-visible,
+.prose__body [tabindex="-1"]:focus-visible,
+.prose__body a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 .prose__body h1,
 .prose__body h2,
 .prose__body h3,
