@@ -1,8 +1,6 @@
 .prose {
-  max-width: 980px;
   width: 100%;
-  margin: 0 auto;
-  padding: 56px clamp(20px, 5%, 64px) 96px;
+  padding: 24px;
 }
 
 .prose__body {
@@ -153,10 +151,21 @@
   margin: 2em 0;
 }
 
+.prose__body .prose__table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  margin: 0 0 1em;
+}
+
+.prose__body .prose__table-scroll:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 .prose__body table {
   border-collapse: collapse;
   width: 100%;
-  margin: 0 0 1em;
+  margin: 0;
 }
 
 .prose__body th,

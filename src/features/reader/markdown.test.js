@@ -19,6 +19,35 @@ describe('renderMarkdown', () => {
     expect(container.querySelectorAll('table tbody td')).toHaveLength(2)
   })
 
+  it.each([
+    '| A | B |\n| - | - |\n| 1 | 2 |',
+    '<table><thead><tr><th>A</th><th>B</th></tr></thead><tbody><tr><td>1</td><td>2</td></tr></tbody></table>',
+  ])('contains each table in an accessible scrolling region', (source) => {
+    const container = document.createElement('div')
+    container.innerHTML = renderMarkdown(source + '\n\n' + source)
+
+    const regions = container.querySelectorAll('.prose__table-scroll')
+    expect(regions).toHaveLength(2)
+    regions.forEach((region) => {
+      expect(region).toHaveAttribute('tabindex', '0')
+      expect(region).toHaveAttribute('role', 'region')
+      expect(region).toHaveAccessibleName('Scrollable table')
+      expect(region.querySelectorAll(':scope > table')).toHaveLength(1)
+      expect(region.querySelectorAll('th')).toHaveLength(2)
+      expect(region.querySelectorAll('tbody td')).toHaveLength(2)
+      expect([...region.querySelectorAll('tbody td')].map((cell) => cell.textContent)).toEqual(['1', '2'])
+    })
+  })
+
+  it('sanitizes raw HTML tables before adding scrolling regions', () => {
+    const container = document.createElement('div')
+    container.innerHTML = renderMarkdown('<table onclick="alert(1)"><tr><td><img src="x" onerror="alert(2)"><script>alert(3)</script>Safe</td></tr></table>')
+
+    expect(container.querySelector('.prose__table-scroll table')).not.toBeNull()
+    expect(container.querySelector('td')).toHaveTextContent('Safe')
+    expect(container.querySelector('script, [onclick], [onerror]')).toBeNull()
+  })
+
   it('preserves checked and unchecked task items as inert checkboxes', () => {
     const container = document.createElement('div')
     container.innerHTML = renderMarkdown('- [x] Done\n- [ ] Todo\n- Plain')

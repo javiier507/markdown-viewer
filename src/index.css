@@ -4,6 +4,7 @@
   --text-h: #08060d;
   --bg: #ffffff;
   --bg-sidebar: #fafafb;
+  --bg-surround: #d8d5dd;
   --bg-hover: #f1f0f4;
   --bg-active: #ece9f3;
   --border: #e8e6ec;
@@ -42,6 +43,7 @@
     --text-h: #f5f3fa;
     --bg: #16151c;
     --bg-sidebar: #111016;
+    --bg-surround: #09080d;
     --bg-hover: #1f1d28;
     --bg-active: #2a2737;
     --border: #2a2833;
@@ -70,6 +72,12 @@ body,
 #root {
   height: 100%;
   margin: 0;
+}
+
+@media (min-width: 1920px) {
+  #root {
+    background: var(--bg-surround);
+  }
 }
 
 button {
