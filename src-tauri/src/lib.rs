@@ -136,6 +136,7 @@ pub fn run() {
     }
 
     builder
+        .plugin(tauri_plugin_opener::init())
         .manage(PendingFile::default())
         .invoke_handler(tauri::generate_handler![take_pending_file, read_dropped_files])
         .setup(|app| {

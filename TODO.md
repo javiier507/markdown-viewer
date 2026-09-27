@@ -13,14 +13,14 @@
 - [x] Add three-dot button with an option to remove file from sidebar.
 - [x] Associate the Markdown file extension so that it can be opened directly from Windows File Explorer.
 - [x] Refactor: split in several component. Modular and isolated component.
-- [ ] Add support for anchor link
+- [x] Add support for anchor link
 - [x] Collapse sidebar
 - [x] Drag and Drop
 - [ ] Save in browser storage: local o session storage, etc
 - [x] Render mermaid
 - [ ] Add draft: Empty markdown files
-- [ ] Open folder and diplay it in sidbear.
+- [ ] Open folder and diplay it in sidebar.
 - [ ] show 3 categories in sidebar: files, folders, draft files.
-- [ ] Add new skill for developing new features: how to fit new features (quality code), TDD, etc
-- [ ] Add PWA support
+- [x] Add new skill for developing new features: how to fit new features (quality code), TDD, etc
+- [x] Add PWA support
 - [ ] Generate builds with Github Action

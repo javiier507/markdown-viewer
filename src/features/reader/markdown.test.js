@@ -2,6 +2,62 @@ import { describe, expect, it } from 'vitest'
 import { renderMarkdown } from './markdown.js'
 
 describe('renderMarkdown', () => {
+  it.each([
+    ['[Web](https://example.com/docs#section)', 'https://example.com/docs#section'],
+    ['[Web](http://example.com)', 'http://example.com/'],
+    ['[Web](//example.com/docs)', 'https://example.com/docs'],
+    ['<a href="HTTPS://example.com/docs" target="_self" rel="opener">Web</a>', 'https://example.com/docs'],
+    ['<a href="//example.com/docs" target="named-window">Web</a>', 'https://example.com/docs'],
+  ])('opens external links safely outside the reader: %s', (source, href) => {
+    const container = document.createElement('div')
+    container.innerHTML = renderMarkdown(source)
+    const link = container.querySelector('a')
+    expect(link).toHaveAttribute('href', href)
+    expect(link).toHaveAttribute('target', '_blank')
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer')
+  })
+
+  it.each(['#section', 'other.md#section', './other.md', '/docs', 'mailto:reader@example.com', 'tel:123', 'https://'])(
+    'does not treat local links, other protocols or malformed URLs as internet links: %s', (href) => {
+      const container = document.createElement('div')
+      container.innerHTML = renderMarkdown(`[Link](${href})`)
+      const link = container.querySelector('a')
+      expect(link).toHaveAttribute('href', href)
+      expect(link).not.toHaveAttribute('target')
+      expect(link).not.toHaveAttribute('rel')
+    })
+
+  it('keeps unsafe HTML links inert while enhancing safe links', () => {
+    const container = document.createElement('div')
+    container.innerHTML = renderMarkdown('<a href="javascript:alert(1)" target="_blank" onclick="alert(2)">Bad</a>\n\n<a href="https://example.com" onclick="alert(3)">Safe</a>')
+    const [bad, safe] = container.querySelectorAll('a')
+    expect(bad).not.toHaveAttribute('href')
+    expect(bad).not.toHaveAttribute('target')
+    expect(container.querySelector('[onclick]')).toBeNull()
+    expect(safe).toHaveAttribute('target', '_blank')
+  })
+
+  it('creates stable anchors from visible heading text at every level', () => {
+    const source = '# **Hello** `World`!\n\n## Instalación rápida\n\n### 中文标题\n\n#### A & B\n\n##### snake_case-dash\n\n###### !!!'
+    const container = document.createElement('div')
+    container.innerHTML = renderMarkdown(source)
+    expect([...container.querySelectorAll('h1, h2, h3, h4, h5, h6')].map((heading) => heading.id))
+      .toEqual(['hello-world', 'instalación-rápida', '中文标题', 'a-b', 'snake_case-dash', 'section'])
+    expect(renderMarkdown(source)).toBe(container.innerHTML)
+  })
+
+  it('reserves explicit destinations before assigning unique heading anchors', () => {
+    const source = '# Topic\n\n## Topic\n\n### Topic-1\n\n<a id="topic"></a>\n\n<a name="topic-2"></a>\n\n<h4 id="custom">Topic</h4>'
+    const container = document.createElement('div')
+    container.innerHTML = renderMarkdown(source)
+    expect([...container.querySelectorAll('h1, h2, h3, h4')].map((heading) => heading.id))
+      .toEqual(['topic-1', 'topic-3', 'topic-1-1', 'custom'])
+    expect(container.querySelector('a[id]')).toHaveAttribute('id', 'topic')
+    expect(container.querySelector('a[name]')).toHaveAttribute('name', 'topic-2')
+    container.innerHTML = renderMarkdown('# Topic')
+    expect(container.querySelector('h1').id).toBe('topic')
+  })
+
   it('preserves Mermaid source as inert plain text', () => {
     const source = 'flowchart LR\n  A["<script>alert(1)</script>"] --> B["A & B"]'
     const container = document.createElement('div')
