@@ -72,6 +72,8 @@
 
 .sidebar__footer {
   display: flex;
+  margin-top: auto;
+  flex-shrink: 0;
   justify-content: flex-end;
   padding: 8px;
   border-top: 1px solid var(--border);
