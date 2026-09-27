@@ -2,6 +2,41 @@ import { describe, expect, it } from 'vitest'
 import { renderMarkdown } from './markdown.js'
 
 describe('renderMarkdown', () => {
+  it.each([
+    ['[Web](https://example.com/docs#section)', 'https://example.com/docs#section'],
+    ['[Web](http://example.com)', 'http://example.com/'],
+    ['[Web](//example.com/docs)', 'https://example.com/docs'],
+    ['<a href="HTTPS://example.com/docs" target="_self" rel="opener">Web</a>', 'https://example.com/docs'],
+    ['<a href="//example.com/docs" target="named-window">Web</a>', 'https://example.com/docs'],
+  ])('opens external links safely outside the reader: %s', (source, href) => {
+    const container = document.createElement('div')
+    container.innerHTML = renderMarkdown(source)
+    const link = container.querySelector('a')
+    expect(link).toHaveAttribute('href', href)
+    expect(link).toHaveAttribute('target', '_blank')
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer')
+  })
+
+  it.each(['#section', 'other.md#section', './other.md', '/docs', 'mailto:reader@example.com', 'tel:123', 'https://'])(
+    'does not treat local links, other protocols or malformed URLs as internet links: %s', (href) => {
+      const container = document.createElement('div')
+      container.innerHTML = renderMarkdown(`[Link](${href})`)
+      const link = container.querySelector('a')
+      expect(link).toHaveAttribute('href', href)
+      expect(link).not.toHaveAttribute('target')
+      expect(link).not.toHaveAttribute('rel')
+    })
+
+  it('keeps unsafe HTML links inert while enhancing safe links', () => {
+    const container = document.createElement('div')
+    container.innerHTML = renderMarkdown('<a href="javascript:alert(1)" target="_blank" onclick="alert(2)">Bad</a>\n\n<a href="https://example.com" onclick="alert(3)">Safe</a>')
+    const [bad, safe] = container.querySelectorAll('a')
+    expect(bad).not.toHaveAttribute('href')
+    expect(bad).not.toHaveAttribute('target')
+    expect(container.querySelector('[onclick]')).toBeNull()
+    expect(safe).toHaveAttribute('target', '_blank')
+  })
+
   it('creates stable anchors from visible heading text at every level', () => {
     const source = '# **Hello** `World`!\n\n## Instalación rápida\n\n### 中文标题\n\n#### A & B\n\n##### snake_case-dash\n\n###### !!!'
     const container = document.createElement('div')

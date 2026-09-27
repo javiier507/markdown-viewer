@@ -82,6 +82,13 @@ bash scripts/install-tauri-rpm.sh
 
 The installation script prompts for your password through `sudo`.
 
+## External links
+
+HTTP and HTTPS links in Markdown open in a new browser tab in the web app and
+PWA. In the desktop app, they open in the default browser. The current document
+and reading position stay in Markdown Viewer. URLs starting with `//` use HTTPS.
+Browser preferences may open a new window instead of a tab.
+
 ## Document anchors
 
 Links such as `[Installation](#installation)` jump to a heading in the current

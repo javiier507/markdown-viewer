@@ -24,6 +24,21 @@ export function renderMarkdown(text) {
     FORBID_TAGS: ['form', 'button', 'textarea', 'select', 'option'],
   })
 
+  body.querySelectorAll('a[href]').forEach((link) => {
+    const href = link.getAttribute('href').trim()
+    if (!/^(?:https?:\/\/|\/\/)/i.test(href)) return
+    let url
+    try {
+      url = new URL(href.startsWith('//') ? `https:${href}` : href)
+    } catch {
+      return
+    }
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return
+    link.setAttribute('href', url.href)
+    link.setAttribute('target', '_blank')
+    link.setAttribute('rel', 'noopener noreferrer')
+  })
+
   const reserved = new Set([...body.querySelectorAll('[id], a[name]')]
     .flatMap((element) => [element.getAttribute('id'), element.getAttribute('name')])
     .filter(Boolean))
