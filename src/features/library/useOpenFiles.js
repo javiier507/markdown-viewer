@@ -16,7 +16,7 @@ export function useOpenFiles() {
 
   const addFiles = async (fileList) => {
     const loaded = await readPickedFiles(fileList, () => nextIdRef.current++)
-    if (loaded.length === 0) return
+    if (loaded.length === 0) return false
 
     const existingKeys = new Map(filesRef.current.map((f) => [f.key, f.id]))
     const additions = []
@@ -37,10 +37,11 @@ export function useOpenFiles() {
       filesRef.current = [...filesRef.current, ...additions]
       setFiles(filesRef.current)
     }
+    return firstId != null
   }
 
   const addFilesFromPaths = (payloads) => {
-    if (payloads.length === 0) return
+    if (payloads.length === 0) return false
     const existingKeys = new Map(filesRef.current.map((f) => [f.key, f.id]))
     const additions = []
     let firstId = null
@@ -59,6 +60,7 @@ export function useOpenFiles() {
       filesRef.current = [...filesRef.current, ...additions]
       setFiles(filesRef.current)
     }
+    return true
   }
 
   const addFileFromPath = (payload) => addFilesFromPaths([payload])
