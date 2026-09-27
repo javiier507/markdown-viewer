@@ -37,5 +37,15 @@ export function renderMarkdown(text) {
     if (checked) input.setAttribute('checked', '')
   })
 
+  body.querySelectorAll('table').forEach((table) => {
+    const wrapper = document.createElement('div')
+    wrapper.className = 'prose__table-scroll'
+    wrapper.tabIndex = 0
+    wrapper.setAttribute('role', 'region')
+    wrapper.setAttribute('aria-label', 'Scrollable table')
+    table.replaceWith(wrapper)
+    wrapper.appendChild(table)
+  })
+
   return body.innerHTML
 }
