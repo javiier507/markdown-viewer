@@ -91,6 +91,11 @@ fn take_pending_file(
 }
 
 #[tauri::command]
+fn read_file(path: String) -> Result<OpenFilePayload, String> {
+    read_file_payload(&path)
+}
+
+#[tauri::command]
 fn read_dropped_files(paths: Vec<String>) -> Vec<OpenFilePayload> {
     let mut files = Vec::new();
     for path in paths {
@@ -138,7 +143,11 @@ pub fn run() {
     builder
         .plugin(tauri_plugin_opener::init())
         .manage(PendingFile::default())
-        .invoke_handler(tauri::generate_handler![take_pending_file, read_dropped_files])
+        .invoke_handler(tauri::generate_handler![
+            take_pending_file,
+            read_dropped_files,
+            read_file
+        ])
         .setup(|app| {
             #[cfg(target_os = "linux")]
             linux_theme::follow_gnome_color_scheme(app);

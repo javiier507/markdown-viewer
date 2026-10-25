@@ -26,4 +26,26 @@ describe('FileListItem', () => {
     expect(onRemove).toHaveBeenCalledWith(3)
     expect(screen.queryByRole('menu')).not.toBeInTheDocument()
   })
+
+  it('offers refresh only for files with a native path', () => {
+    const onRefresh = vi.fn()
+    const { rerender } = render(
+      <FileListItem file={file} isActive={true} onSelect={vi.fn()} onRemove={vi.fn()} onRefresh={onRefresh} />,
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Options for notes.md' }))
+    expect(screen.queryByRole('menuitem', { name: 'Refresh file' })).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Options for notes.md' }))
+
+    rerender(
+      <FileListItem file={{ ...file, path: '/notes.md' }} isActive={true} onSelect={vi.fn()}
+        onRemove={vi.fn()} onRefresh={onRefresh} />,
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Options for notes.md' }))
+    const refresh = screen.getByRole('menuitem', { name: 'Refresh file' })
+    expect(refresh).toHaveAttribute('aria-keyshortcuts', 'Control+r Meta+r')
+    fireEvent.click(refresh)
+
+    expect(onRefresh).toHaveBeenCalledWith(3)
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+  })
 })

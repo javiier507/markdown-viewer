@@ -21,4 +21,13 @@ describe('matchesShortcut', () => {
     expect(matchesShortcut(press({ ctrlKey: true, altKey: true }), shortcut)).toBe(false)
     expect(matchesShortcut(press({ metaKey: true, shiftKey: true }), shortcut)).toBe(false)
   })
+
+  it('matches Ctrl+R and Cmd+R for refreshing a file', () => {
+    const refresh = SHORTCUTS.refreshFile
+    expect(matchesShortcut(press({ key: 'r', ctrlKey: true }), refresh)).toBe(true)
+    expect(matchesShortcut(press({ key: 'R', metaKey: true }), refresh)).toBe(true)
+    expect(matchesShortcut(press({ key: 'r', ctrlKey: true, shiftKey: true }), refresh)).toBe(false)
+    expect(matchesShortcut(press({ key: 'r', ctrlKey: true, altKey: true }), refresh)).toBe(false)
+    expect(matchesShortcut(press({ key: 'b', ctrlKey: true }), refresh)).toBe(false)
+  })
 })

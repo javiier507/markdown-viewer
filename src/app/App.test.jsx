@@ -1,7 +1,14 @@
-import { createEvent, fireEvent, render, screen } from '@testing-library/react'
+import { act, createEvent, fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import App from './App.jsx'
+import { readFileFromPath } from '../platform/tauri/readFileFromPath.js'
+
+const tauri = vi.hoisted(() => ({ openFile: null }))
+vi.mock('../platform/tauri/useTauriOpenFile.js', () => ({
+  useTauriOpenFile: (handler) => { tauri.openFile = handler },
+}))
+vi.mock('../platform/tauri/readFileFromPath.js', () => ({ readFileFromPath: vi.fn() }))
 
 vi.mock('../features/reader/mermaid.js', () => ({
   renderDiagram: vi.fn().mockResolvedValue('<svg viewBox="0 0 400 200"><text>Diagram</text></svg>'),
@@ -182,5 +189,41 @@ describe('App', () => {
     fireEvent.click(second)
     expect(screen.queryByRole('dialog')).toBeNull()
     expect(await screen.findByRole('button', { name: 'Expand diagram' })).toBeInTheDocument()
+  })
+
+  it('refreshes the active native file with Ctrl+R or Cmd+R', async () => {
+    Element.prototype.scrollIntoView = vi.fn()
+    readFileFromPath.mockReset()
+    readFileFromPath.mockResolvedValue({ path: '/notes.md', name: 'notes.md', content: '# Updated' })
+    render(<App />)
+    act(() => tauri.openFile({ path: '/notes.md', name: 'notes.md', content: '# Original' }))
+    expect(screen.getByRole('heading', { name: 'Original' })).toBeInTheDocument()
+
+    const shortcut = createEvent.keyDown(window, { key: 'r', ctrlKey: true })
+    fireEvent(window, shortcut)
+    expect(shortcut.defaultPrevented).toBe(true)
+    expect(readFileFromPath).toHaveBeenCalledWith('/notes.md')
+    expect(await screen.findByRole('heading', { name: 'Updated' })).toBeInTheDocument()
+
+    readFileFromPath.mockResolvedValue({ path: '/notes.md', name: 'notes.md', content: '# Again' })
+    fireEvent.keyDown(window, { key: 'r', metaKey: true })
+    expect(await screen.findByRole('heading', { name: 'Again' })).toBeInTheDocument()
+  })
+
+  it('blocks Ctrl+R reloads without rereading browser files', async () => {
+    Element.prototype.scrollIntoView = vi.fn()
+    readFileFromPath.mockReset()
+    const user = userEvent.setup()
+    const { container } = render(<App />)
+    const empty = createEvent.keyDown(window, { key: 'r', ctrlKey: true })
+    fireEvent(window, empty)
+    expect(empty.defaultPrevented).toBe(false)
+
+    await user.upload(container.querySelector('input[type="file"]'), new File(['# Document'], 'doc.md'))
+    const shortcut = createEvent.keyDown(window, { key: 'r', ctrlKey: true })
+    fireEvent(window, shortcut)
+    expect(shortcut.defaultPrevented).toBe(true)
+    expect(readFileFromPath).not.toHaveBeenCalled()
+    expect(screen.getByRole('heading', { name: 'Document' })).toBeInTheDocument()
   })
 })

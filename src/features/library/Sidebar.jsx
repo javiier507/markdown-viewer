@@ -13,6 +13,7 @@ export default function Sidebar({
   onAdd,
   onSelect,
   onRemove,
+  onRefresh,
   onToggleCollapse,
 }) {
   const toggleLabel = isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'
@@ -39,6 +40,7 @@ export default function Sidebar({
           activeItemRef={activeItemRef}
           onSelect={onSelect}
           onRemove={onRemove}
+          onRefresh={onRefresh}
         />
       </div>
 

@@ -83,6 +83,26 @@ describe('useOpenFiles', () => {
     expect(result.current.activeFile.content).toBe('one')
   })
 
+  it('keeps native paths and updates only the content of the matching file', () => {
+    const { result } = renderHook(useOpenFiles)
+    act(() => result.current.addFileFromPath({ path: '/one.md', name: 'one.md', content: 'one' }))
+    const firstId = result.current.activeId
+    act(() => result.current.addFileFromPath({ path: '/two.md', name: 'two.md', content: 'two' }))
+    expect(result.current.files.map((f) => f.path)).toEqual(['/one.md', '/two.md'])
+
+    act(() => result.current.updateFileContent(firstId, 'one updated'))
+    expect(result.current.files.map((f) => f.content)).toEqual(['one updated', 'two'])
+
+    const unchanged = result.current.files
+    act(() => result.current.updateFileContent(firstId, 'one updated'))
+    expect(result.current.files).toBe(unchanged)
+
+    act(() => result.current.removeFile(firstId))
+    act(() => result.current.updateFileContent(firstId, 'late read'))
+    expect(result.current.files).toHaveLength(1)
+    expect(result.current.files[0].content).toBe('two')
+  })
+
   it('keeps the active file when removing another and clears it when removing the active file', () => {
     const { result } = renderHook(useOpenFiles)
     act(() => result.current.addFileFromPath({ path: '/one.md', name: 'one.md', content: 'one' }))

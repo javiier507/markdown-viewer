@@ -82,6 +82,15 @@ bash scripts/install-tauri-rpm.sh
 
 The installation script prompts for your password through `sudo`.
 
+## Refreshing files
+
+In the desktop app, press **Ctrl/Cmd+R** to reread the active document from disk
+after it changes outside Markdown Viewer, or choose **Refresh file** from a
+file's options menu in the sidebar. The document stays open and keeps its reading
+position. Browser files cannot be reread after they change, so in the web app
+reopen the file instead. While documents are open, Ctrl/Cmd+R never reloads the
+app, so open documents are not lost.
+
 ## External links
 
 HTTP and HTTPS links in Markdown open in a new browser tab in the web app and

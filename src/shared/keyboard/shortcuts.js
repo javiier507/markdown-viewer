@@ -5,6 +5,12 @@ export const SHORTCUTS = {
     ariaKeyShortcuts: 'Control+b Meta+b',
     label: 'Ctrl/Cmd+B',
   },
+  refreshFile: {
+    key: 'r',
+    mod: true,
+    ariaKeyShortcuts: 'Control+r Meta+r',
+    label: 'Ctrl/Cmd+R',
+  },
 }
 
 export function matchesShortcut(event, shortcut) {

@@ -1,6 +1,6 @@
 import FileListItem from './FileListItem.jsx'
 
-export default function FileList({ files, activeId, activeItemRef, onSelect, onRemove }) {
+export default function FileList({ files, activeId, activeItemRef, onSelect, onRemove, onRefresh }) {
   return (
     <ul className="file-list">
       {files.map((file) => {
@@ -13,6 +13,7 @@ export default function FileList({ files, activeId, activeItemRef, onSelect, onR
             itemRef={isActive ? activeItemRef : null}
             onSelect={onSelect}
             onRemove={onRemove}
+            onRefresh={onRefresh}
           />
         )
       })}

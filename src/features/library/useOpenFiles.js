@@ -50,7 +50,7 @@ export function useOpenFiles() {
       let id = existingKeys.get(key)
       if (id == null) {
         id = nextIdRef.current++
-        additions.push({ id, name, key, content })
+        additions.push({ id, name, key, path, content })
         existingKeys.set(key, id)
       }
       if (firstId == null) firstId = id
@@ -73,6 +73,13 @@ export function useOpenFiles() {
 
   const selectFile = (id) => setActiveId(id)
 
+  const updateFileContent = (id, content) => {
+    const current = filesRef.current.find((f) => f.id === id)
+    if (!current || current.content === content) return
+    filesRef.current = filesRef.current.map((f) => (f.id === id ? { ...f, content } : f))
+    setFiles(filesRef.current)
+  }
+
   return {
     files,
     activeId,
@@ -82,5 +89,6 @@ export function useOpenFiles() {
     addFilesFromPaths,
     removeFile,
     selectFile,
+    updateFileContent,
   }
 }

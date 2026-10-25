@@ -2,11 +2,18 @@ import { createPortal } from 'react-dom'
 import FileIcon from '../../shared/ui/icons/FileIcon.jsx'
 import DotsIcon from '../../shared/ui/icons/DotsIcon.jsx'
 import CloseIcon from '../../shared/ui/icons/CloseIcon.jsx'
+import RefreshIcon from '../../shared/ui/icons/RefreshIcon.jsx'
+import { SHORTCUTS } from '../../shared/keyboard/shortcuts.js'
 import { useFloatingMenu } from './useFloatingMenu.js'
 
-export default function FileListItem({ file, isActive, itemRef, onSelect, onRemove }) {
+export default function FileListItem({ file, isActive, itemRef, onSelect, onRemove, onRefresh }) {
   const { isOpen, menuPos, triggerRef, menuRef, openMenu, closeMenu, handleMenuKeyDown } =
     useFloatingMenu()
+
+  function handleRefresh() {
+    closeMenu()
+    onRefresh(file.id)
+  }
 
   function handleRemove() {
     closeMenu()
@@ -50,6 +57,20 @@ export default function FileListItem({ file, isActive, itemRef, onSelect, onRemo
           style={{ top: menuPos.top, left: menuPos.left }}
           onKeyDown={handleMenuKeyDown}
         >
+          {file.path && (
+            <li role="none">
+              <button
+                type="button"
+                className="file-item__dropdown-action"
+                role="menuitem"
+                onClick={handleRefresh}
+                aria-keyshortcuts={isActive ? SHORTCUTS.refreshFile.ariaKeyShortcuts : undefined}
+              >
+                <RefreshIcon />
+                Refresh file
+              </button>
+            </li>
+          )}
           <li role="none">
             <button
               type="button"

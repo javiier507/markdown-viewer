@@ -4,6 +4,7 @@ import { useOpenFiles } from '../features/library/useOpenFiles.js'
 import { useScrollActiveIntoView } from '../features/library/useScrollActiveIntoView.js'
 import { useTauriOpenFile } from '../platform/tauri/useTauriOpenFile.js'
 import { useTauriFileDrop } from '../platform/tauri/useTauriFileDrop.js'
+import { readFileFromPath } from '../platform/tauri/readFileFromPath.js'
 import { useFileDrop } from '../features/library/useFileDrop.js'
 import HiddenFileInput from '../features/library/HiddenFileInput.jsx'
 import Sidebar from '../features/library/Sidebar.jsx'
@@ -21,6 +22,7 @@ function App() {
     addFilesFromPaths,
     removeFile,
     selectFile,
+    updateFileContent,
   } = useOpenFiles()
   const activeItemRef = useScrollActiveIntoView(activeId)
   const fileInputRef = useRef(null)
@@ -60,23 +62,39 @@ function App() {
     setIsSidebarCollapsed((isCollapsed) => !isCollapsed)
   }, [])
 
+  // Only native files keep a path; browser File objects cannot be reread reliably.
+  const refreshFile = async (id) => {
+    const file = files.find((f) => f.id === id)
+    if (!file?.path) return
+    const payload = await readFileFromPath(file.path)
+    if (payload) updateFileContent(id, payload.content)
+  }
+  const refreshFileRef = useRef(refreshFile)
+  useEffect(() => {
+    refreshFileRef.current = refreshFile
+  })
+
   useEffect(() => {
     const handleKeyDown = (event) => {
-      if (!hasFiles || event.defaultPrevented || event.repeat || event.isComposing
-        || !matchesShortcut(event, SHORTCUTS.toggleSidebar)) return
+      if (!hasFiles || event.defaultPrevented || event.repeat || event.isComposing) return
+      const isToggleSidebar = matchesShortcut(event, SHORTCUTS.toggleSidebar)
+      const isRefreshFile = matchesShortcut(event, SHORTCUTS.refreshFile)
+      if (!isToggleSidebar && !isRefreshFile) return
 
       const target = event.target
       if (target instanceof HTMLElement
         && (target.closest('input, textarea, select') || target.isContentEditable
           || target.closest('[contenteditable]:not([contenteditable="false"])'))) return
 
+      // Also blocks Ctrl+R from reloading the page, which would drop every open document.
       event.preventDefault()
-      toggleSidebar()
+      if (isToggleSidebar) toggleSidebar()
+      else if (activeId != null) refreshFileRef.current(activeId)
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [hasFiles, toggleSidebar])
+  }, [hasFiles, activeId, toggleSidebar])
 
   return (
     <div className={`app ${hasFiles ? '' : 'app--empty'}`} {...dropHandlers}>
@@ -92,6 +110,7 @@ function App() {
           onAdd={openFilePicker}
           onSelect={selectDocument}
           onRemove={removeFile}
+          onRefresh={refreshFile}
           onToggleCollapse={toggleSidebar}
         />
       )}
