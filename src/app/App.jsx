@@ -8,6 +8,7 @@ import { useFileDrop } from '../features/library/useFileDrop.js'
 import HiddenFileInput from '../features/library/HiddenFileInput.jsx'
 import Sidebar from '../features/library/Sidebar.jsx'
 import MarkdownView from '../features/reader/MarkdownView.jsx'
+import { SHORTCUTS, matchesShortcut } from '../shared/keyboard/shortcuts.js'
 import EmptyState from './EmptyState.jsx'
 
 function App() {
@@ -62,8 +63,7 @@ function App() {
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (!hasFiles || event.defaultPrevented || event.repeat || event.isComposing
-        || !event.ctrlKey || event.altKey || event.shiftKey || event.metaKey
-        || event.key.toLowerCase() !== 'b') return
+        || !matchesShortcut(event, SHORTCUTS.toggleSidebar)) return
 
       const target = event.target
       if (target instanceof HTMLElement

@@ -19,8 +19,8 @@ describe('Sidebar', () => {
     expect(screen.getByRole('button', { name: 'one.md' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'two.md' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'two.md' }).closest('li')).toHaveClass('file-item--active')
-    expect(screen.getByRole('button', { name: 'Collapse sidebar' })).toHaveAttribute('aria-keyshortcuts', 'Control+b')
-    expect(screen.getByRole('button', { name: 'Collapse sidebar' })).toHaveAttribute('title', 'Collapse sidebar (Ctrl+B)')
+    expect(screen.getByRole('button', { name: 'Collapse sidebar' })).toHaveAttribute('aria-keyshortcuts', 'Control+b Meta+b')
+    expect(screen.getByRole('button', { name: 'Collapse sidebar' })).toHaveAttribute('title', 'Collapse sidebar (Ctrl/Cmd+B)')
     fireEvent.click(screen.getByRole('button', { name: 'Collapse sidebar' }))
     expect(onToggleCollapse).toHaveBeenCalledOnce()
 

@@ -1,6 +1,7 @@
 import './library.css'
 import PlusIcon from '../../shared/ui/icons/PlusIcon.jsx'
 import SidebarToggleIcon from '../../shared/ui/icons/SidebarToggleIcon.jsx'
+import { SHORTCUTS } from '../../shared/keyboard/shortcuts.js'
 import FileList from './FileList.jsx'
 
 export default function Sidebar({
@@ -49,8 +50,8 @@ export default function Sidebar({
           aria-controls="sidebar-content"
           aria-expanded={!isCollapsed}
           aria-label={toggleLabel}
-          aria-keyshortcuts="Control+b"
-          title={`${toggleLabel} (Ctrl+B)`}
+          aria-keyshortcuts={SHORTCUTS.toggleSidebar.ariaKeyShortcuts}
+          title={`${toggleLabel} (${SHORTCUTS.toggleSidebar.label})`}
         >
           <SidebarToggleIcon isCollapsed={isCollapsed} />
         </button>

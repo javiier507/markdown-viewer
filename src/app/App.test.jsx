@@ -84,7 +84,7 @@ describe('App', () => {
     expect(screen.getByRole('heading', { name: 'Second document' })).toBeInTheDocument()
   })
 
-  it('toggles the sidebar with Ctrl+B and shares state with the button', async () => {
+  it('toggles the sidebar with Ctrl+B or Cmd+B and shares state with the button', async () => {
     Element.prototype.scrollIntoView = vi.fn()
     const user = userEvent.setup()
     const { container, unmount } = render(<App />)
@@ -101,6 +101,12 @@ describe('App', () => {
     await user.click(screen.getByRole('button', { name: 'Collapse sidebar' }))
     fireEvent.keyDown(window, { key: 'B', ctrlKey: true })
     expect(screen.getByRole('button', { name: 'Collapse sidebar' })).toHaveAttribute('aria-expanded', 'true')
+    const metaShortcut = createEvent.keyDown(window, { key: 'b', metaKey: true })
+    fireEvent(window, metaShortcut)
+    expect(metaShortcut.defaultPrevented).toBe(true)
+    expect(screen.getByRole('button', { name: 'Expand sidebar' })).toHaveAttribute('aria-expanded', 'false')
+    fireEvent.keyDown(window, { key: 'b', metaKey: true })
+    expect(screen.getByRole('button', { name: 'Collapse sidebar' })).toHaveAttribute('aria-expanded', 'true')
 
     unmount()
     const afterUnmount = createEvent.keyDown(window, { key: 'b', ctrlKey: true })
@@ -116,7 +122,7 @@ describe('App', () => {
 
     for (const options of [
       { ctrlKey: false }, { key: 'a' }, { altKey: true }, { shiftKey: true },
-      { metaKey: true }, { repeat: true }, { isComposing: true },
+      { metaKey: true }, { repeat: true }, { isComposing: true }, // metaKey + ctrlKey together
     ]) {
       const event = createEvent.keyDown(window, { key: 'b', ctrlKey: true, ...options })
       fireEvent(window, event)
