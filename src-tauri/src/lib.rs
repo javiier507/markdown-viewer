@@ -142,6 +142,7 @@ pub fn run() {
 
     builder
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_dialog::init())
         .manage(PendingFile::default())
         .invoke_handler(tauri::generate_handler![
             take_pending_file,

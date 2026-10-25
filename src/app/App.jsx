@@ -5,6 +5,7 @@ import { useScrollActiveIntoView } from '../features/library/useScrollActiveInto
 import { useTauriOpenFile } from '../platform/tauri/useTauriOpenFile.js'
 import { useTauriFileDrop } from '../platform/tauri/useTauriFileDrop.js'
 import { readFileFromPath } from '../platform/tauri/readFileFromPath.js'
+import { isTauri, pickFilesFromDialog } from '../platform/tauri/pickFilesFromDialog.js'
 import { useFileDrop } from '../features/library/useFileDrop.js'
 import HiddenFileInput from '../features/library/HiddenFileInput.jsx'
 import Sidebar from '../features/library/Sidebar.jsx'
@@ -56,7 +57,14 @@ function App() {
   const nativeDragging = useTauriFileDrop(openFilesFromPaths)
   const { isDragging, ...dropHandlers } = useFileDrop(openFiles)
 
-  const openFilePicker = () => fileInputRef.current?.click()
+  const openFilePicker = async () => {
+    if (!isTauri()) {
+      fileInputRef.current?.click()
+      return
+    }
+    const payloads = await pickFilesFromDialog()
+    if (payloads.length > 0) openFilesFromPaths(payloads)
+  }
   const hasFiles = files.length > 0
   const toggleSidebar = useCallback(() => {
     setIsSidebarCollapsed((isCollapsed) => !isCollapsed)
