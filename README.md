@@ -38,8 +38,9 @@ pnpm test:coverage # generate a coverage report
 
 ## Install as a web app (PWA)
 
-The production web app can be installed using the browser's **Install app**
-option. On iPhone and iPad, use Safari's share menu and **Add to Home Screen**.
+The production web app can be installed using the **Install app** button
+(shown in browsers that support it, such as Chrome and Edge, and hidden once the
+app is installed or inside the desktop app) or the browser's own install option. On iPhone and iPad, use Safari's share menu and **Add to Home Screen**.
 Installation options depend on the browser and platform. The installed app opens
 in a standalone window using the name **Markdown Viewer**.
 

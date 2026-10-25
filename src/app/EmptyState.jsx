@@ -1,7 +1,8 @@
 import DocIcon from '../shared/ui/icons/DocIcon.jsx'
 import GitHubIcon from '../shared/ui/icons/GitHubIcon.jsx'
+import InstallIcon from '../shared/ui/icons/InstallIcon.jsx'
 
-export default function EmptyState({ onOpen }) {
+export default function EmptyState({ onOpen, onInstall }) {
   return (
     <div className="empty-state">
       <div className="empty-state__icon" aria-hidden="true">
@@ -24,6 +25,16 @@ export default function EmptyState({ onOpen }) {
         </p>
         <p className="empty-state__tagline">Forever</p>
       </div>
+      {onInstall && (
+        <button
+          type="button"
+          className="empty-state__install"
+          onClick={onInstall}
+        >
+          <InstallIcon />
+          <span>Install app</span>
+        </button>
+      )}
       <a
         className="empty-state__repo"
         href="https://github.com/javiier507/markdown-viewer"

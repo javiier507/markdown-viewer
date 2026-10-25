@@ -1,4 +1,5 @@
 import './library.css'
+import InstallIcon from '../../shared/ui/icons/InstallIcon.jsx'
 import PlusIcon from '../../shared/ui/icons/PlusIcon.jsx'
 import SidebarToggleIcon from '../../shared/ui/icons/SidebarToggleIcon.jsx'
 import { SHORTCUTS } from '../../shared/keyboard/shortcuts.js'
@@ -14,6 +15,7 @@ export default function Sidebar({
   onSelect,
   onRemove,
   onRefresh,
+  onInstall,
   onToggleCollapse,
 }) {
   const toggleLabel = isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'
@@ -45,6 +47,17 @@ export default function Sidebar({
       </div>
 
       <footer className="sidebar__footer">
+        {onInstall && (
+          <button
+            type="button"
+            className="sidebar__install"
+            onClick={onInstall}
+            aria-label="Install app"
+            title="Install app"
+          >
+            <InstallIcon />
+          </button>
+        )}
         <button
           type="button"
           className="sidebar__toggle"

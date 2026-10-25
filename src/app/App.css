@@ -82,13 +82,16 @@
   letter-spacing: 0.2px;
 }
 
+.empty-state__install,
 .empty-state__repo {
   margin-top: 18px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 4px 10px;
+  border: 0;
   border-radius: 6px;
+  background: transparent;
   color: var(--text-muted);
   font-size: 13px;
   text-decoration: none;
@@ -97,11 +100,17 @@
     background-color 0.12s ease;
 }
 
+.empty-state__install + .empty-state__repo {
+  margin-top: 6px;
+}
+
+.empty-state__install:hover,
 .empty-state__repo:hover {
   color: var(--text-h);
   background: var(--bg-hover);
 }
 
+.empty-state__install:focus-visible,
 .empty-state__repo:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;

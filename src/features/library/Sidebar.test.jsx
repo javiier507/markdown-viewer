@@ -32,4 +32,18 @@ describe('Sidebar', () => {
     expect(container.querySelector('#sidebar-content')).toHaveAttribute('hidden')
     expect(screen.getByRole('button', { name: 'Expand sidebar' })).toHaveAttribute('aria-expanded', 'false')
   })
+
+  it('offers installation only when an install action is available', () => {
+    const onInstall = vi.fn()
+    const props = {
+      files, activeId: 1, activeItemRef: null, isCollapsed: false,
+      onAdd: vi.fn(), onSelect: vi.fn(), onRemove: vi.fn(), onToggleCollapse: vi.fn(),
+    }
+    const { rerender } = render(<Sidebar {...props} />)
+    expect(screen.queryByRole('button', { name: 'Install app' })).not.toBeInTheDocument()
+
+    rerender(<Sidebar {...props} onInstall={onInstall} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Install app' }))
+    expect(onInstall).toHaveBeenCalledOnce()
+  })
 })

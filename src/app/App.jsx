@@ -6,6 +6,7 @@ import { useTauriOpenFile } from '../platform/tauri/useTauriOpenFile.js'
 import { useTauriFileDrop } from '../platform/tauri/useTauriFileDrop.js'
 import { readFileFromPath } from '../platform/tauri/readFileFromPath.js'
 import { isTauri, pickFilesFromDialog } from '../platform/tauri/pickFilesFromDialog.js'
+import { useInstallPrompt } from '../platform/web/useInstallPrompt.js'
 import { useFileDrop } from '../features/library/useFileDrop.js'
 import HiddenFileInput from '../features/library/HiddenFileInput.jsx'
 import Sidebar from '../features/library/Sidebar.jsx'
@@ -56,6 +57,8 @@ function App() {
   useTauriOpenFile(openFileFromPath)
   const nativeDragging = useTauriFileDrop(openFilesFromPaths)
   const { isDragging, ...dropHandlers } = useFileDrop(openFiles)
+  const { canInstall, install } = useInstallPrompt()
+  const onInstall = canInstall ? install : undefined
 
   const openFilePicker = async () => {
     if (!isTauri()) {
@@ -119,6 +122,7 @@ function App() {
           onSelect={selectDocument}
           onRemove={removeFile}
           onRefresh={refreshFile}
+          onInstall={onInstall}
           onToggleCollapse={toggleSidebar}
         />
       )}
@@ -127,7 +131,7 @@ function App() {
         {activeFile ? (
           <MarkdownView key={activeId} content={activeFile.content} />
         ) : (
-          <EmptyState onOpen={openFilePicker} />
+          <EmptyState onOpen={openFilePicker} onInstall={onInstall} />
         )}
       </main>
       {(isDragging || nativeDragging) && (

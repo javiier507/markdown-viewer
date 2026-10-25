@@ -80,11 +80,22 @@
 }
 
 .sidebar--collapsed .sidebar__footer {
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
   padding-inline: 0;
 }
 
-.sidebar__toggle {
+.sidebar__install {
+  margin-right: auto;
+}
+
+.sidebar--collapsed .sidebar__install {
+  margin-right: 0;
+}
+
+.sidebar__toggle,
+.sidebar__install {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -101,16 +112,19 @@
     transform 0.05s ease;
 }
 
-.sidebar__toggle:hover {
+.sidebar__toggle:hover,
+.sidebar__install:hover {
   background: var(--bg-hover);
   color: var(--text-h);
 }
 
-.sidebar__toggle:active {
+.sidebar__toggle:active,
+.sidebar__install:active {
   transform: translateY(1px);
 }
 
-.sidebar__toggle:focus-visible {
+.sidebar__toggle:focus-visible,
+.sidebar__install:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
