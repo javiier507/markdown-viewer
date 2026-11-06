@@ -15,6 +15,8 @@
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
+    "tauri:build:rpm": "tauri build --bundles rpm",
+    "tauri:build:appimage": "NO_STRIP=true tauri build --bundles appimage",
     "agents:link": "mkdir -p .agents && ln -sfn ../.claude/skills .agents/skills",
     "commit": "cz",
     "prepare": "husky"

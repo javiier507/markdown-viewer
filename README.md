@@ -77,11 +77,24 @@ pnpm tauri        # raw Tauri CLI passthrough (e.g. pnpm tauri info)
 Build artifacts land in `src-tauri/target/release/bundle/`. On Fedora, build and install the RPM with:
 
 ```sh
-pnpm tauri:build --bundles rpm
+pnpm tauri:build:rpm
 bash scripts/install-tauri-rpm.sh
 ```
 
 The installation script prompts for your password through `sudo`.
+
+To build an AppImage on Linux, run:
+
+```sh
+pnpm tauri:build:appimage
+```
+
+This script sets `NO_STRIP=true` because the `strip` bundled with `linuxdeploy`
+cannot read the `.relr.dyn` sections in modern Fedora system libraries. Skipping
+stripping allows packaging to complete, but may increase the AppImage size.
+The environment variable syntax in this script is intended for Linux shells.
+The general `tauri:build` command still builds all configured bundle formats;
+on Fedora, use the dedicated scripts above to avoid the AppImage stripping error.
 
 ## Refreshing files
 
