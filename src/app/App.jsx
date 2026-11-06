@@ -91,13 +91,13 @@ function App() {
       const isToggleSidebar = matchesShortcut(event, SHORTCUTS.toggleSidebar)
       const isRefreshFile = matchesShortcut(event, SHORTCUTS.refreshFile)
       if (!isToggleSidebar && !isRefreshFile) return
+      if (isRefreshFile && !activeFile?.path) return
 
       const target = event.target
       if (target instanceof HTMLElement
         && (target.closest('input, textarea, select') || target.isContentEditable
           || target.closest('[contenteditable]:not([contenteditable="false"])'))) return
 
-      // Also blocks Ctrl+R from reloading the page, which would drop every open document.
       event.preventDefault()
       if (isToggleSidebar) toggleSidebar()
       else if (activeId != null) refreshFileRef.current(activeId)
@@ -105,7 +105,7 @@ function App() {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [hasFiles, activeId, toggleSidebar])
+  }, [hasFiles, activeId, activeFile?.path, toggleSidebar])
 
   return (
     <div className={`app ${hasFiles ? '' : 'app--empty'}`} {...dropHandlers}>

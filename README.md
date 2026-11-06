@@ -91,8 +91,8 @@ file's options menu in the sidebar. The document stays open and keeps its readin
 position. This works for every file opened in the desktop app: with **Open File**
 or **+** (which use the native file dialog), by dropping it on the window, or
 from the system. Browser files cannot be reread after they change, so in the web app
-reopen the file instead. While documents are open, Ctrl/Cmd+R never reloads the
-app, so open documents are not lost.
+reopen the file instead. In the web app, Ctrl/Cmd+R keeps the browser's normal
+behavior and reloads the page. Open documents must be reopened after reloading.
 
 ## External links
 

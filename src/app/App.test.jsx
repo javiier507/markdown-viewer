@@ -216,19 +216,19 @@ describe('App', () => {
     expect(await screen.findByRole('heading', { name: 'Again' })).toBeInTheDocument()
   })
 
-  it('blocks Ctrl+R reloads without rereading browser files', async () => {
+  it.each(['ctrlKey', 'metaKey'])('allows browser reloads with %s+R without rereading browser files', async (modifier) => {
     Element.prototype.scrollIntoView = vi.fn()
     readFileFromPath.mockReset()
     const user = userEvent.setup()
     const { container } = render(<App />)
-    const empty = createEvent.keyDown(window, { key: 'r', ctrlKey: true })
+    const empty = createEvent.keyDown(window, { key: 'r', [modifier]: true })
     fireEvent(window, empty)
     expect(empty.defaultPrevented).toBe(false)
 
     await user.upload(container.querySelector('input[type="file"]'), new File(['# Document'], 'doc.md'))
-    const shortcut = createEvent.keyDown(window, { key: 'r', ctrlKey: true })
+    const shortcut = createEvent.keyDown(window, { key: 'r', [modifier]: true })
     fireEvent(window, shortcut)
-    expect(shortcut.defaultPrevented).toBe(true)
+    expect(shortcut.defaultPrevented).toBe(false)
     expect(readFileFromPath).not.toHaveBeenCalled()
     expect(screen.getByRole('heading', { name: 'Document' })).toBeInTheDocument()
   })
